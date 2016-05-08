@@ -12,7 +12,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 /**
- * 
+ * 服务器端解码器。
  * @author shildon<shildondu@gmail.com>
  * @date May 3, 2016
  */
@@ -32,8 +32,15 @@ public class MQServerDecoder extends ByteToMessageDecoder {
 		int size = in.readableBytes();
 		byte[] data = new byte[size];
 		in.readBytes(data);
-		Object obj = SerializeUtil.deserialize(data, clazz);
-		out.add(obj);
+		Object object = null;
+		
+		try {
+			object = SerializeUtil.deserialize(data, clazz);
+		} catch(IllegalStateException e) {
+			log.error("the request is not mqrequest!", e);
+		}
+		
+		out.add(object);
 	}
 
 }

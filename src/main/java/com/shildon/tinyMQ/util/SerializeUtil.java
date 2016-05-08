@@ -9,7 +9,7 @@ import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
 
 /**
- * 
+ * 序列化工具。
  * @author shildon<shildondu@gmail.com>
  * @date May 2, 2016
  */

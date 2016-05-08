@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * 
+ * 读取Properties文件工具类。
  * @author shildon<shildondu@gmail.com>
  * @date May 2, 2016
  */

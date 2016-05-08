@@ -1,7 +1,7 @@
 package com.shildon.tinyMQ.core;
 
 /**
- * 
+ * 进行序列化的实体类，之所以要用该类对内容进行包装是为了方便序列化。
  * @author shildon<shildondu@gmail.com>
  * @date May 6, 2016
  */

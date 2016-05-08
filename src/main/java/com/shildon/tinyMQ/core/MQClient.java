@@ -18,7 +18,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 /**
- * 
+ * 客户端。
  * @author shildon<shildondu@gmail.com>
  * @date May 6, 2016
  */

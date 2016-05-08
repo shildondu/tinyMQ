@@ -12,7 +12,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
- * 
+ * 服务器端处理器。
  * @author shildon<shildondu@gmail.com>
  * @date May 6, 2016
  */

@@ -1,7 +1,7 @@
 package com.shildon.tinyMQ.core;
 
 /**
- * 
+ * 响应类。
  * @author shildon<shildondu@gmail.com>
  * @date May 3, 2016
  */

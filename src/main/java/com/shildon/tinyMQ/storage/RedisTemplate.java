@@ -10,7 +10,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
 
 /**
- * 
+ * Redis存储操作。
  * @author shildon<shildondu@gmail.com>
  * @date May 3, 2016
  */

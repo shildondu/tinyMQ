@@ -11,7 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 /**
- * 
+ * 客户端编码器。
  * @author shildon<shildondu@gmail.com>
  * @date May 6, 2016
  */
