@@ -1,5 +1,8 @@
 package com.shildon.tinyMQ.storage;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.shildon.tinyMQ.core.MQEntity;
 import com.shildon.tinyMQ.util.PropertiesUtil;
 import com.shildon.tinyMQ.util.SerializeUtil;
@@ -15,8 +18,8 @@ import redis.clients.jedis.Protocol;
  * @date May 3, 2016
  */
 public class RedisTemplate {
-	// redis://:auth@localhost:6380/0~15
-//	private String uri;
+	//	redis://:auth@localhost:6380/0~15
+	//	private String uri;
 	private String host;
 	private int port;
 	private int timeout;
@@ -24,7 +27,16 @@ public class RedisTemplate {
 
 	private JedisPool jedisPool;
 	
-	public RedisTemplate() {
+	// 饿汉式单例模式
+	private static final RedisTemplate INSTANCE = new RedisTemplate();
+	
+	private final Log log = LogFactory.getLog(RedisTemplate.class);
+	
+	public static RedisTemplate getInstance() {
+		return INSTANCE;
+	}
+	
+	private RedisTemplate() {
 		init();
 	}
 	
@@ -64,7 +76,7 @@ public class RedisTemplate {
 			byte[] contentByte = SerializeUtil.serialize(mqEntity);
 			jedis.rpush(queueIdByte, contentByte);
 		} catch(Exception e) {
-			e.printStackTrace();
+			log.error("Offer to MQ fail!", e);
 			return false;
 		}
 		return true;
@@ -75,10 +87,14 @@ public class RedisTemplate {
 		try (Jedis jedis = jedisPool.getResource()) {
 			byte[] queueIdByte = queueId.getBytes();
 			byte[] contentByte = jedis.lpop(queueIdByte);
-			mqEntity = SerializeUtil.deserialize(contentByte, MQEntity.class);
-			return mqEntity.getContent();
+			if (null != contentByte) {
+				mqEntity = SerializeUtil.deserialize(contentByte, MQEntity.class);
+				return mqEntity.getContent();
+			} else {
+				return null;
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Poll from MQ fail!", e);
 		}
 		return mqEntity.getContent();
 	}
