@@ -37,7 +37,10 @@ public class MQServerDecoder extends ByteToMessageDecoder {
 		try {
 			object = SerializeUtil.deserialize(data, clazz);
 		} catch(IllegalStateException e) {
-			log.error("the request is not mqrequest!", e);
+			log.error("the request is not a mqrequest!");
+			// 关闭SocketChannel
+			ctx.close().sync();
+			return;
 		}
 		
 		out.add(object);
