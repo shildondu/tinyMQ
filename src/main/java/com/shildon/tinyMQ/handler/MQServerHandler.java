@@ -19,7 +19,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 public class MQServerHandler extends SimpleChannelInboundHandler<MQRequest> {
 	
 	// TODO
-	private RedisTemplate redisTemplate = new RedisTemplate();
+	private RedisTemplate redisTemplate = RedisTemplate.getInstance();
 
 	private final Log log = LogFactory.getLog(MQServerHandler.class);
 
@@ -37,7 +37,7 @@ public class MQServerHandler extends SimpleChannelInboundHandler<MQRequest> {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		log.error(null, cause);
+		log.error("server handler error!", cause);
 		ctx.close();
 	}
 	
