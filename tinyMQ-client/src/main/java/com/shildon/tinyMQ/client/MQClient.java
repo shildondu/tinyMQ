@@ -1,10 +1,13 @@
-package com.shildon.tinyMQ.core;
+package com.shildon.tinyMQ.client;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.shildon.tinyMQ.handler.MQClientDecoder;
-import com.shildon.tinyMQ.handler.MQClientEncoder;
+import com.shildon.tinyMQ.client.handler.MQClientDecoder;
+import com.shildon.tinyMQ.client.handler.MQClientEncoder;
+import com.shildon.tinyMQ.core.MQRequest;
+import com.shildon.tinyMQ.core.MQResponse;
+import com.shildon.tinyMQ.core.MQTransferType;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;

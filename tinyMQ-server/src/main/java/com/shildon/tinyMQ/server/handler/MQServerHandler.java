@@ -1,4 +1,4 @@
-package com.shildon.tinyMQ.handler;
+package com.shildon.tinyMQ.server.handler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,7 +18,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
  */
 public class MQServerHandler extends SimpleChannelInboundHandler<MQRequest> {
 	
-	// TODO
 	private RedisTemplate redisTemplate = RedisTemplate.getInstance();
 
 	private final Log log = LogFactory.getLog(MQServerHandler.class);

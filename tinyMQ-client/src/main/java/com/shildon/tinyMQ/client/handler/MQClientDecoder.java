@@ -1,4 +1,4 @@
-package com.shildon.tinyMQ.handler;
+package com.shildon.tinyMQ.client.handler;
 
 import java.util.List;
 

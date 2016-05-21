@@ -1,8 +1,9 @@
-package com.shildon.tinyMQ.core;
+package com.shildon.tinyMQ.server;
 
-import com.shildon.tinyMQ.handler.MQServerDecoder;
-import com.shildon.tinyMQ.handler.MQServerEncoder;
-import com.shildon.tinyMQ.handler.MQServerHandler;
+import com.shildon.tinyMQ.core.MQRequest;
+import com.shildon.tinyMQ.server.handler.MQServerDecoder;
+import com.shildon.tinyMQ.server.handler.MQServerEncoder;
+import com.shildon.tinyMQ.server.handler.MQServerHandler;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;

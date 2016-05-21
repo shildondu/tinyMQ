@@ -1,4 +1,4 @@
-package com.shildon.tinyMQ.handler;
+package com.shildon.tinyMQ.server.handler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
