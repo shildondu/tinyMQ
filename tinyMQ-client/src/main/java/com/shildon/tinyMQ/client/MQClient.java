@@ -1,8 +1,5 @@
 package com.shildon.tinyMQ.client;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.shildon.tinyMQ.client.handler.MQClientDecoder;
 import com.shildon.tinyMQ.client.handler.MQClientEncoder;
 import com.shildon.tinyMQ.core.MQRequest;
@@ -19,6 +16,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 客户端。
@@ -35,7 +34,7 @@ public class MQClient extends SimpleChannelInboundHandler<MQResponse> {
 	// 这里不使用Condition是因为不需要用到Lock来同步代码块
 	private final Object object = new Object();
 	
-	private final Log log = LogFactory.getLog(MQClient.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MQClient.class);
 	
 	public MQClient(String host, int port) {
 		this.host = host;
@@ -97,8 +96,8 @@ public class MQClient extends SimpleChannelInboundHandler<MQResponse> {
 	
 	@Override
 	protected void messageReceived(ChannelHandlerContext ctx, MQResponse msg) throws Exception {
-		log.debug("enter client handler ...");
-		log.debug("mq response type: " + msg.getMqTransferType());
+		LOGGER.debug("enter client handler ...");
+		LOGGER.debug("mq response type: " + msg.getMqTransferType());
 		this.mqResponse = msg;
 		
 		synchronized (object) {

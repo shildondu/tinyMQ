@@ -1,14 +1,13 @@
 package com.shildon.tinyMQ.server.handler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.shildon.tinyMQ.core.MQResponse;
 import com.shildon.tinyMQ.util.SerializeUtil;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 服务器端编码器。
@@ -17,11 +16,11 @@ import io.netty.handler.codec.MessageToByteEncoder;
  */
 public class MQServerEncoder extends MessageToByteEncoder<MQResponse> {
 	
-	private final Log log = LogFactory.getLog(MQServerEncoder.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MQServerEncoder.class);
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, MQResponse msg, ByteBuf out) throws Exception {
-		log.debug("enter mq server encode ...");
+		LOGGER.debug("enter mq server encode ...");
 		byte[] data = SerializeUtil.serialize(msg);
 		out.writeBytes(data);
 	}

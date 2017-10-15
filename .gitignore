@@ -18,3 +18,5 @@ tinyMQ-client/.project
 tinyMQ-core/target
 tinyMQ-server/target
 tinyMQ-client/target
+*.iml
+.idea

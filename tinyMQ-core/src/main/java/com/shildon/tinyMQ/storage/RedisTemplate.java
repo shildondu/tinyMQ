@@ -1,12 +1,11 @@
 package com.shildon.tinyMQ.storage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.shildon.tinyMQ.core.MQEntity;
 import com.shildon.tinyMQ.util.PropertiesUtil;
 import com.shildon.tinyMQ.util.SerializeUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -30,7 +29,7 @@ public class RedisTemplate {
 	// 饿汉式单例模式
 	private static final RedisTemplate INSTANCE = new RedisTemplate();
 	
-	private final Log log = LogFactory.getLog(RedisTemplate.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RedisTemplate.class);
 	
 	public static RedisTemplate getInstance() {
 		return INSTANCE;
@@ -76,7 +75,7 @@ public class RedisTemplate {
 			byte[] contentByte = SerializeUtil.serialize(mqEntity);
 			jedis.rpush(queueIdByte, contentByte);
 		} catch(Exception e) {
-			log.error("Offer to MQ fail!", e);
+			LOGGER.error("Offer to MQ fail!", e);
 			return false;
 		}
 		return true;
@@ -94,7 +93,7 @@ public class RedisTemplate {
 				return null;
 			}
 		} catch (Exception e) {
-			log.error("Poll from MQ fail!", e);
+			LOGGER.error("Poll from MQ fail!", e);
 		}
 		return mqEntity.getContent();
 	}

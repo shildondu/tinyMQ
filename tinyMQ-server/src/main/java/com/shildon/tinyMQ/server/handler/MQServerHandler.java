@@ -1,8 +1,5 @@
 package com.shildon.tinyMQ.server.handler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.shildon.tinyMQ.core.MQRequest;
 import com.shildon.tinyMQ.core.MQResponse;
 import com.shildon.tinyMQ.storage.RedisTemplate;
@@ -10,6 +7,8 @@ import com.shildon.tinyMQ.storage.RedisTemplate;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 服务器端处理器。
@@ -20,23 +19,23 @@ public class MQServerHandler extends SimpleChannelInboundHandler<MQRequest> {
 	
 	private RedisTemplate redisTemplate = RedisTemplate.getInstance();
 
-	private final Log log = LogFactory.getLog(MQServerHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MQServerHandler.class);
 
 	@Override
 	protected void messageReceived(ChannelHandlerContext ctx, MQRequest msg) throws Exception {
-		log.debug("enter server handler ...");
-		log.debug("mq request type: " + msg.getMqTransferType());
+		LOGGER.debug("enter server handler ...");
+		LOGGER.debug("mq request type: " + msg.getMqTransferType());
 		if (null != msg.getMqTransferType()) {
 			MQResponse mqResponse = handle(msg);
 			ctx.writeAndFlush(mqResponse).addListener(ChannelFutureListener.CLOSE);
 		} else {
-			log.debug("mq request is null!");
+			LOGGER.debug("mq request is null!");
 		}
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		log.error("server handler error!", cause);
+		LOGGER.error("server handler error!", cause);
 		ctx.close();
 	}
 	
@@ -44,8 +43,8 @@ public class MQServerHandler extends SimpleChannelInboundHandler<MQRequest> {
 		MQResponse mqResponse = new MQResponse()
 				.setMqTransferType(mqRequest.getMqTransferType());
 		
-		String queueId = null;
-		Object content = null;
+		String queueId;
+		Object content;
 		
 		switch (mqRequest.getMqTransferType()) {
 		case offer:
