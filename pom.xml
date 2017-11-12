@@ -65,6 +65,7 @@
   	    <module>tinyMQ-core</module>
         <module>tinyMQ-server</module>
         <module>tinyMQ-client</module>
+        <module>tinyMQ-demo</module>
     </modules>
   
     <build>
