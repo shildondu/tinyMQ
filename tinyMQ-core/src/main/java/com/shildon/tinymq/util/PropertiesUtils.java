@@ -1,4 +1,4 @@
-package com.shildon.tinyMQ.util;
+package com.shildon.tinymq.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,33 +6,36 @@ import java.util.Properties;
 
 /**
  * 读取Properties文件工具类。
- * @author shildon<shildondu@gmail.com>
+ *
+ * @author shildon<shildondu @ gmail.com>
  * @date May 2, 2016
  */
-public class PropertiesUtil {
+public final class PropertiesUtils {
 
 	private static Properties properties;
-	
-	public static void load(String fileName) {
+
+	private PropertiesUtils() {}
+
+	public static void load(final String fileName) {
 		properties = new Properties();
 		try {
 			properties.load(Thread.currentThread().getContextClassLoader().
 					getResourceAsStream(fileName));
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void load(InputStream inputStream) {
+
+	public static void load(final InputStream inputStream) {
 		properties = new Properties();
 		try {
 			properties.load(inputStream);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public static Object getValue(Object key) {
+
+	public static Object getValue(final Object key) {
 		return properties.get(key);
 	}
 
