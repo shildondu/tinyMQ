@@ -45,6 +45,7 @@ public class MqServer {
 					})
 					// set connections queue size
 					.option(ChannelOption.SO_BACKLOG, 128)
+					// open tcp keepalive
 					.childOption(ChannelOption.SO_KEEPALIVE, true);
 
 			final ChannelFuture channelFuture = serverBootstrap.bind(this.port).sync();

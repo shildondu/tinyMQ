@@ -2,7 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.shildon</groupId>
     <artifactId>tinyMQ</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -21,7 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netty.version>4.1.45.Final</netty.version>
         <jedis.version>2.8.0</jedis.version>
-        <protobuf.version>1.0.9</protobuf.version>
+        <protostuff.version>1.6.2</protostuff.version>
     </properties>
 
     <dependencies>
@@ -38,15 +37,15 @@
         </dependency>
 
         <dependency>
-            <groupId>com.dyuproject.protostuff</groupId>
+            <groupId>io.protostuff</groupId>
             <artifactId>protostuff-core</artifactId>
-            <version>${protobuf.version}</version>
+            <version>${protostuff.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.dyuproject.protostuff</groupId>
+            <groupId>io.protostuff</groupId>
             <artifactId>protostuff-runtime</artifactId>
-            <version>${protobuf.version}</version>
+            <version>${protostuff.version}</version>
         </dependency>
 
         <dependency>
