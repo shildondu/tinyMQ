@@ -51,12 +51,13 @@ public class MqClient extends SimpleChannelInboundHandler<MqResponse> {
 					.handler(new ChannelInitializer<SocketChannel>() {
 						@Override
 						protected void initChannel(final SocketChannel ch) throws Exception {
-							ch.pipeline().addLast(new MqClientEncoder())
+							ch.pipeline()
+									.addLast(new MqClientEncoder())
 									.addLast(new MqClientDecoder(MqResponse.class))
 									.addLast(MqClient.this);
 						}
 					})
-					.option(ChannelOption.SO_KEEPALIVE, true);
+					.option(ChannelOption.TCP_NODELAY, true);
 
 			final ChannelFuture channelFuture = bootstrap.connect(this.host, this.port).sync();
 			channelFuture.channel().writeAndFlush(mqRequest).sync();

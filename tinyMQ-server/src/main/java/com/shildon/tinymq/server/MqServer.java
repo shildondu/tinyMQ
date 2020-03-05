@@ -44,9 +44,9 @@ public class MqServer {
 						}
 					})
 					// set connections queue size
-					.option(ChannelOption.SO_BACKLOG, 128)
-					// open tcp keepalive
-					.childOption(ChannelOption.SO_KEEPALIVE, true);
+					.option(ChannelOption.SO_BACKLOG, 1024)
+					// no delay for sending packet
+					.childOption(ChannelOption.TCP_NODELAY, true);
 
 			final ChannelFuture channelFuture = serverBootstrap.bind(this.port).sync();
 			channelFuture.channel().closeFuture().sync();
