@@ -7,14 +7,14 @@ import io.netty.buffer.ByteBuf;
 /**
  * @author shildon
  */
-public class MessageRequestBody {
+public class MessageResponseBody {
     private byte[] serializedData;
 
-    public MessageRequestBody(final byte[] data) {
+    public MessageResponseBody(final byte[] data) {
         this.serializedData = data;
     }
 
-    public MessageRequestBody(final ByteBuf byteBuf) {
+    public MessageResponseBody(final ByteBuf byteBuf) {
         this.decode(byteBuf);
     }
 
@@ -31,7 +31,7 @@ public class MessageRequestBody {
 
     @Override
     public String toString() {
-        return "MessageRequestBody{" +
+        return "MessageResponseBody{" +
                 "serializedData=" + Arrays.toString(this.serializedData) +
                 '}';
     }
