@@ -5,18 +5,18 @@ import io.netty.buffer.ByteBuf;
 /**
  * @author shildon
  */
-public class MessageHeader {
+public class MessageRequestHeader {
     private long id;
     private int version;
     private int operationCode;
 
-    public MessageHeader(final long id, final int version, final int operationCode) {
+    public MessageRequestHeader(final long id, final int version, final int operationCode) {
         this.id = id;
         this.version = version;
         this.operationCode = operationCode;
     }
 
-    public MessageHeader(final ByteBuf byteBuf) {
+    public MessageRequestHeader(final ByteBuf byteBuf) {
         this.decode(byteBuf);
     }
 

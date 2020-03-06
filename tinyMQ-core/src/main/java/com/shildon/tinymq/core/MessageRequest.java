@@ -5,22 +5,22 @@ import io.netty.buffer.ByteBuf;
 /**
  * @author shildon
  */
-public class Message<T> {
-    private MessageHeader header;
-    private MessageBody<T> body;
+public class MessageRequest {
+    private MessageRequestHeader header;
+    private MessageRequestBody body;
 
-    public Message(final MessageHeader header, final MessageBody<T> body) {
+    public MessageRequest(final MessageRequestHeader header, final MessageRequestBody body) {
         this.header = header;
         this.body = body;
     }
 
-    public Message(final ByteBuf byteBuf) {
+    public MessageRequest(final ByteBuf byteBuf) {
         this.decode(byteBuf);
     }
 
     public void decode(final ByteBuf byteBuf) {
-        this.header = new MessageHeader(byteBuf);
-        this.body = new MessageBody<>(byteBuf, Operation.find(this.header.getOperationCode()).getBodyType());
+        this.header = new MessageRequestHeader(byteBuf);
+        this.body = new MessageRequestBody(byteBuf);
     }
 
     public void encode(final ByteBuf byteBuf) {
@@ -36,19 +36,19 @@ public class Message<T> {
                 '}';
     }
 
-    public MessageHeader getHeader() {
+    public MessageRequestHeader getHeader() {
         return this.header;
     }
 
-    public void setHeader(final MessageHeader header) {
+    public void setHeader(final MessageRequestHeader header) {
         this.header = header;
     }
 
-    public MessageBody<T> getBody() {
+    public MessageRequestBody getBody() {
         return this.body;
     }
 
-    public void setBody(final MessageBody<T> body) {
+    public void setBody(final MessageRequestBody body) {
         this.body = body;
     }
 }
