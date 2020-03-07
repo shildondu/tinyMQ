@@ -1,6 +1,9 @@
 package com.shildon.tinymq.server.handler;
 
 import com.shildon.tinymq.core.MessageRequest;
+import com.shildon.tinymq.core.MessageResponse;
+import com.shildon.tinymq.core.MessageResponseBody;
+import com.shildon.tinymq.core.MessageResponseHeader;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -9,14 +12,13 @@ import org.slf4j.LoggerFactory;
 /**
  * 服务器端处理器。
  *
- * @author shildon<shildondu @ gmail.com>
- * @date May 6, 2016
+ * @author shildon
  */
 public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> {
 
-	// private final RedisTemplate redisTemplate = RedisTemplate.getInstance();
+    // private final RedisTemplate redisTemplate = RedisTemplate.getInstance();
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandler.class);
 
 	/*
 	@Override
@@ -33,17 +35,20 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> 
 
 	 */
 
-	@Override
-	public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
-		LOGGER.error("server handler error!", cause);
-		ctx.close();
-	}
+    @Override
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
+        LOGGER.error("server handler error!", cause);
+        ctx.close();
+    }
 
-	@Override
-	protected void channelRead0(final ChannelHandlerContext ctx, final MessageRequest msg) {
-		LOGGER.info("start handle request...");
-		// TODO
-	}
+    @Override
+    protected void channelRead0(final ChannelHandlerContext ctx, final MessageRequest msg) {
+        LOGGER.info("start handle request...");
+        LOGGER.info("the request is [{}]", msg);
+        // TODO
+        MessageResponse messageResponse = new MessageResponse(new MessageResponseHeader(1L, 1, 1, 1), new MessageResponseBody("pong".getBytes()));
+        ctx.writeAndFlush(messageResponse);
+    }
 
 	/*
 	private MqResponse handle(final MqRequest mqRequest) {

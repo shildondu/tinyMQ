@@ -36,20 +36,22 @@ public class MessageServer {
     public void run() {
         final EventLoopGroup bossGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("boss"));
         final EventLoopGroup workerGroup = new NioEventLoopGroup(new DefaultThreadFactory("workers"));
+        final LoggingHandler loggingHandler = new LoggingHandler();
         try {
             final ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
+                    .handler(loggingHandler)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(final SocketChannel ch) {
                             ch.pipeline()
-                                    .addLast(new MessageRequestDecoder())
                                     .addLast(new MessageFrameDecoder())
                                     .addLast(new MessageFrameEncoder())
+                                    .addLast(new MessageRequestDecoder())
                                     .addLast(new MessageResponseEncoder())
                                     .addLast(new MessageHandler())
-                                    .addLast(new LoggingHandler());
+                                    .addLast(loggingHandler);
                         }
                     })
                     // set connections queue size
