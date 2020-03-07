@@ -1,4 +1,4 @@
-package com.shildon.tinymq.server.codec;
+package com.shildon.tinymq.codec;
 
 import com.shildon.tinymq.constant.Constant;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;

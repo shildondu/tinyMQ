@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author shildon
  */
-public class MessageEncoder extends MessageToByteEncoder<MessageResponse> {
+public class MessageResponseEncoder extends MessageToByteEncoder<MessageResponse> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MessageEncoder.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MessageResponseEncoder.class);
 
 	@Override
 	protected void encode(final ChannelHandlerContext ctx, final MessageResponse msg, final ByteBuf out) {

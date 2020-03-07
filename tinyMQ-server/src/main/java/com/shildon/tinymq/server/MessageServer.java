@@ -1,8 +1,9 @@
 package com.shildon.tinymq.server;
 
-import com.shildon.tinymq.core.MqRequest;
-import com.shildon.tinymq.server.codec.MessageDecoder;
-import com.shildon.tinymq.server.codec.MessageEncoder;
+import com.shildon.tinymq.server.codec.MessageRequestDecoder;
+import com.shildon.tinymq.server.codec.MessageResponseEncoder;
+import com.shildon.tinymq.codec.MessageFrameDecoder;
+import com.shildon.tinymq.codec.MessageFrameEncoder;
 import com.shildon.tinymq.server.handler.MessageHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -12,6 +13,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.concurrent.DefaultThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 服务器端
@@ -20,39 +25,51 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
  */
 public class MessageServer {
 
-	private final int port;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageServer.class);
 
-	public MessageServer(final int port) {
-		this.port = port;
-	}
+    private final int port;
 
-	public void run() throws Exception {
-		final EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-		final EventLoopGroup workerGroup = new NioEventLoopGroup();
-		try {
-			final ServerBootstrap serverBootstrap = new ServerBootstrap();
-			serverBootstrap.group(bossGroup, workerGroup)
-					.channel(NioServerSocketChannel.class)
-					.childHandler(new ChannelInitializer<SocketChannel>() {
-						@Override
-						protected void initChannel(final SocketChannel ch) {
-							ch.pipeline()
-									.addLast(new MessageEncoder())
-									.addLast(new MessageDecoder())
-									.addLast(new MessageHandler());
-						}
-					})
-					// set connections queue size
-					.option(ChannelOption.SO_BACKLOG, 1024)
-					// no delay for sending packet
-					.childOption(ChannelOption.TCP_NODELAY, true);
+    public MessageServer(final int port) {
+        this.port = port;
+    }
 
-			final ChannelFuture channelFuture = serverBootstrap.bind(this.port).sync();
-			channelFuture.channel().closeFuture().sync();
-		} finally {
-			workerGroup.shutdownGracefully();
-			bossGroup.shutdownGracefully();
-		}
-	}
-	
+    public void run() {
+        final EventLoopGroup bossGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("boss"));
+        final EventLoopGroup workerGroup = new NioEventLoopGroup(new DefaultThreadFactory("workers"));
+        try {
+            final ServerBootstrap serverBootstrap = new ServerBootstrap();
+            serverBootstrap.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(final SocketChannel ch) {
+                            ch.pipeline()
+                                    .addLast(new MessageRequestDecoder())
+                                    .addLast(new MessageFrameDecoder())
+                                    .addLast(new MessageFrameEncoder())
+                                    .addLast(new MessageResponseEncoder())
+                                    .addLast(new MessageHandler())
+                                    .addLast(new LoggingHandler());
+                        }
+                    })
+                    // set connections queue size
+                    .option(ChannelOption.SO_BACKLOG, 1024)
+                    // no delay for sending packet
+                    .childOption(ChannelOption.TCP_NODELAY, true);
+
+            final ChannelFuture channelFuture = serverBootstrap.bind(this.port).sync();
+            channelFuture.channel().closeFuture().sync();
+        } catch (InterruptedException e) {
+            LOGGER.error("start message server error!", e);
+        } finally {
+            workerGroup.shutdownGracefully();
+            bossGroup.shutdownGracefully();
+        }
+    }
+
+    public static void main(String[] args) {
+        MessageServer messageServer = new MessageServer(10101);
+        messageServer.run();
+    }
+
 }

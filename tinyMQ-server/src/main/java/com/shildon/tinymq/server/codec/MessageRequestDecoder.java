@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author shildon
  */
-public class MessageDecoder extends ByteToMessageDecoder {
+public class MessageRequestDecoder extends ByteToMessageDecoder {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MessageDecoder.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MessageRequestDecoder.class);
 
 	@Override
 	protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) {
