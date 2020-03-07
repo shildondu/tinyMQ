@@ -8,12 +8,12 @@ import io.protostuff.runtime.RuntimeSchema;
 /**
  * 序列化工具。
  *
- * @author shildon<shildondu @ gmail.com>
- * @date May 2, 2016
+ * @author shildon
  */
-public final class SerializeUtils {
+public final class ProtostuffSerializeUtils {
 
-    private SerializeUtils() {}
+    private ProtostuffSerializeUtils() {
+    }
 
     /**
      * 序列化

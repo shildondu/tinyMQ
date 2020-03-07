@@ -2,7 +2,7 @@ package com.shildon.tinymq.storage;
 
 import com.shildon.tinymq.core.MqEntity;
 import com.shildon.tinymq.util.PropertiesUtils;
-import com.shildon.tinymq.util.SerializeUtils;
+import com.shildon.tinymq.util.ProtostuffSerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -71,7 +71,7 @@ public class RedisTemplate {
 			final byte[] queueIdByte = queueId.getBytes();
 			final MqEntity mqEntity = new MqEntity().setClazz(content.getClass()).
 					setContent(content);
-			final byte[] contentByte = SerializeUtils.serialize(mqEntity);
+			final byte[] contentByte = ProtostuffSerializeUtils.serialize(mqEntity);
 			jedis.rpush(queueIdByte, contentByte);
 		} catch (final Exception e) {
 			LOGGER.error("Offer to MQ fail!", e);
@@ -86,7 +86,7 @@ public class RedisTemplate {
 			final byte[] queueIdByte = queueId.getBytes();
 			final byte[] contentByte = jedis.lpop(queueIdByte);
 			if (null != contentByte) {
-				mqEntity = SerializeUtils.deserialize(contentByte, MqEntity.class);
+				mqEntity = ProtostuffSerializeUtils.deserialize(contentByte, MqEntity.class);
 				return mqEntity.getContent();
 			} else {
 				return null;
