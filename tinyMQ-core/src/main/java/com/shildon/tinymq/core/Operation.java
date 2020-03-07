@@ -10,38 +10,38 @@ import java.util.List;
  */
 public enum Operation {
 
-	/**
-	 * offer
-	 */
-	OFFER(1, String.class),
+    /**
+     * publish
+     */
+    PUBLISH(1, PublishMessageRequestBody.class),
 
-	/**
-	 * poll
-	 */
-	POLL(2, String.class);
+    /**
+     * subscribe
+     */
+    SUBSCRIBE(2, SubscribeMessageRequestBody.class);
 
-	private final int code;
-	private final Class<?> bodyType;
+    private final int code;
+    private final Class<?> bodyType;
 
-	Operation(final int code, final Class<?> bodyType) {
-		this.code = code;
-		this.bodyType = bodyType;
-	}
+    Operation(final int code, final Class<?> bodyType) {
+        this.code = code;
+        this.bodyType = bodyType;
+    }
 
-	public static Operation find(final int code) {
-		final List<Operation> operations = Arrays.asList(Operation.values());
-		return operations.stream()
-				.filter(it -> it.code == code)
-				.findFirst()
-				.orElseThrow(() -> new IllegalArgumentException(String.format("code: [%s] has no operation", code)));
-	}
+    public static Operation find(final int code) {
+        final List<Operation> operations = Arrays.asList(Operation.values());
+        return operations.stream()
+                .filter(it -> it.code == code)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(String.format("code: [%s] has no operation", code)));
+    }
 
-	public int getCode() {
-		return this.code;
-	}
+    public int getCode() {
+        return this.code;
+    }
 
-	public Class<?> getBodyType() {
-		return this.bodyType;
-	}
+    public Class<?> getBodyType() {
+        return this.bodyType;
+    }
 
 }
