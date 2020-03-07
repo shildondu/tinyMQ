@@ -22,6 +22,13 @@ public class MessageResponseHeader {
         this.decode(byteBuf);
     }
 
+    public MessageResponseHeader(final MessageResponseCode responseCode, final MessageRequestHeader requestHeader) {
+        this.id = requestHeader.getId();
+        this.code = responseCode.getValue();
+        this.version = requestHeader.getVersion();
+        this.operationCode = requestHeader.getOperationCode();
+    }
+
     public void decode(final ByteBuf byteBuf) {
         this.id = byteBuf.readLong();
         this.code = byteBuf.readInt();

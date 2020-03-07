@@ -1,82 +1,43 @@
 package com.shildon.tinymq.server.handler;
 
-import com.shildon.tinymq.core.MessageRequest;
-import com.shildon.tinymq.core.MessageResponse;
-import com.shildon.tinymq.core.MessageResponseBody;
-import com.shildon.tinymq.core.MessageResponseHeader;
+import com.shildon.tinymq.core.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 服务器端处理器。
+ * 服务器端处理器
  *
  * @author shildon
  */
 public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> {
 
-    // private final RedisTemplate redisTemplate = RedisTemplate.getInstance();
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandler.class);
 
-	/*
-	@Override
-	protected void channelRead0(final ChannelHandlerContext channelHandlerContext, final MqRequest mqRequest) throws Exception {
-		LOGGER.debug("enter server handler ...");
-		LOGGER.debug("mq request type: " + mqRequest.getMqTransferType());
-		if (null != mqRequest.getMqTransferType()) {
-			final MqResponse mqResponse = this.handle(mqRequest);
-			channelHandlerContext.writeAndFlush(mqResponse).addListener(ChannelFutureListener.CLOSE);
-		} else {
-			LOGGER.debug("mq request is null!");
-		}
-	}
+    @Override
+    protected void channelRead0(final ChannelHandlerContext ctx, final MessageRequest messageRequest) {
+        LOGGER.info("start handle request -> {}", messageRequest);
+        int operationCode = messageRequest.getHeader().getOperationCode();
+        Operation operation = Operation.find(operationCode);
+        byte[] serializedBody = messageRequest.getBody().getSerializedData();
+        this.handleOperation(operation, serializedBody);
+        // todo supply body
+        MessageResponseHeader messageResponseHeader = new MessageResponseHeader(MessageResponseCode.SUCCESS, messageRequest.getHeader());
+        MessageResponseBody messageResponseBody = new MessageResponseBody();
+        MessageResponse messageResponse = new MessageResponse(messageResponseHeader, messageResponseBody);
+        // todo separate write and flush.
+        ctx.writeAndFlush(messageResponse);
+    }
 
-	 */
+    private void handleOperation(Operation operation, byte[] serializedBody) {
+
+    }
 
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
         LOGGER.error("server handler error!", cause);
         ctx.close();
     }
-
-    @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final MessageRequest msg) {
-        LOGGER.info("start handle request...");
-        LOGGER.info("the request is [{}]", msg);
-        // TODO
-        MessageResponse messageResponse = new MessageResponse(new MessageResponseHeader(1L, 1, 1, 1), new MessageResponseBody("pong".getBytes()));
-        ctx.writeAndFlush(messageResponse);
-    }
-
-	/*
-	private MqResponse handle(final MqRequest mqRequest) {
-		final MqResponse mqResponse = new MqResponse()
-				.setMqTransferType(mqRequest.getMqTransferType());
-
-		final String queueId;
-		final Object content;
-
-		switch (mqRequest.getMqTransferType()) {
-			case offer:
-				queueId = mqRequest.getQueueId();
-				content = mqRequest.getContent();
-				final boolean result = this.redisTemplate.offer(queueId, content);
-				mqResponse.setContent(result);
-				break;
-
-			case poll:
-				queueId = mqRequest.getQueueId();
-				content = this.redisTemplate.poll(queueId);
-				mqResponse.setContent(content);
-				break;
-
-			default:
-				break;
-		}
-		return mqResponse;
-	}
-	 */
 
 }

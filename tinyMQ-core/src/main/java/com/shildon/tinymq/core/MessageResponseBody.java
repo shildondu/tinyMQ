@@ -10,6 +10,9 @@ import io.netty.buffer.ByteBuf;
 public class MessageResponseBody {
     private byte[] serializedData;
 
+    public MessageResponseBody() {
+    }
+
     public MessageResponseBody(final byte[] data) {
         this.serializedData = data;
     }
