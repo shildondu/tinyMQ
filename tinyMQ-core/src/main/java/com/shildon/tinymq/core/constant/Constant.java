@@ -1,4 +1,4 @@
-package com.shildon.tinymq.constant;
+package com.shildon.tinymq.core.constant;
 
 /**
  * @author shildon

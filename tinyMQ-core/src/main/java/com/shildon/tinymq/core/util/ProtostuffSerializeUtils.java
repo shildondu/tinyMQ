@@ -1,4 +1,4 @@
-package com.shildon.tinymq.util;
+package com.shildon.tinymq.core.util;
 
 import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;

@@ -1,4 +1,4 @@
-package com.shildon.tinymq.core;
+package com.shildon.tinymq.core.model;
 
 import java.util.Arrays;
 import java.util.List;

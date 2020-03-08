@@ -1,6 +1,7 @@
 package com.shildon.tinymq.server.handler;
 
-import com.shildon.tinymq.core.*;
+import com.shildon.tinymq.core.model.*;
+import com.shildon.tinymq.core.util.ProtostuffSerializeUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -31,12 +32,19 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> 
     }
 
     private void handleOperation(Operation operation, byte[] serializedBody) {
-
+        switch (operation) {
+            case PUBLISH: {
+                PublishMessageRequestBody publishMessageRequestBody = ProtostuffSerializeUtils.deserialize(serializedBody, PublishMessageRequestBody.class);
+            }
+            case SUBSCRIBE: {
+                SubscribeMessageRequestBody subscribeMessageRequestBody = ProtostuffSerializeUtils.deserialize(serializedBody, SubscribeMessageRequestBody.class);
+            }
+        }
     }
 
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
-        LOGGER.error("server handler error!", cause);
+        LOGGER.error("handle error!", cause);
         ctx.close();
     }
 

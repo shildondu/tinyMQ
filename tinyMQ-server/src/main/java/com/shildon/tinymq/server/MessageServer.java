@@ -2,8 +2,8 @@ package com.shildon.tinymq.server;
 
 import com.shildon.tinymq.server.codec.MessageRequestDecoder;
 import com.shildon.tinymq.server.codec.MessageResponseEncoder;
-import com.shildon.tinymq.codec.MessageFrameDecoder;
-import com.shildon.tinymq.codec.MessageFrameEncoder;
+import com.shildon.tinymq.core.codec.MessageFrameDecoder;
+import com.shildon.tinymq.core.codec.MessageFrameEncoder;
 import com.shildon.tinymq.server.handler.MessageHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;

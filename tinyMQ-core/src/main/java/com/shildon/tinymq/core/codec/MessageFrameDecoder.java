@@ -1,6 +1,6 @@
-package com.shildon.tinymq.codec;
+package com.shildon.tinymq.core.codec;
 
-import com.shildon.tinymq.constant.Constant;
+import com.shildon.tinymq.core.constant.Constant;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 /**

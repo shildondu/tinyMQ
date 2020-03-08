@@ -2,7 +2,7 @@ package com.shildon.tinymq.server.codec;
 
 import java.util.List;
 
-import com.shildon.tinymq.core.MessageRequest;
+import com.shildon.tinymq.core.model.MessageRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;

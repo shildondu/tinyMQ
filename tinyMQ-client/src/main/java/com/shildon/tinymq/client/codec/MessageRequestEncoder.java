@@ -1,6 +1,6 @@
 package com.shildon.tinymq.client.codec;
 
-import com.shildon.tinymq.core.MessageRequest;
+import com.shildon.tinymq.core.model.MessageRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;

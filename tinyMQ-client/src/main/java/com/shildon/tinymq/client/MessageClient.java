@@ -2,11 +2,11 @@ package com.shildon.tinymq.client;
 
 import com.shildon.tinymq.client.codec.MessageRequestEncoder;
 import com.shildon.tinymq.client.codec.MessageResponseDecoder;
-import com.shildon.tinymq.codec.MessageFrameDecoder;
-import com.shildon.tinymq.codec.MessageFrameEncoder;
-import com.shildon.tinymq.core.MessageRequest;
-import com.shildon.tinymq.core.MessageRequestBody;
-import com.shildon.tinymq.core.MessageRequestHeader;
+import com.shildon.tinymq.core.codec.MessageFrameDecoder;
+import com.shildon.tinymq.core.codec.MessageFrameEncoder;
+import com.shildon.tinymq.core.model.MessageRequest;
+import com.shildon.tinymq.core.model.MessageRequestBody;
+import com.shildon.tinymq.core.model.MessageRequestHeader;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;

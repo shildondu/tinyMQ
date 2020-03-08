@@ -1,4 +1,4 @@
-package com.shildon.tinymq.util;
+package com.shildon.tinymq.core.util;
 
 import java.io.IOException;
 import java.io.InputStream;
