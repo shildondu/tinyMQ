@@ -46,12 +46,12 @@ public class MessageServer {
                         @Override
                         protected void initChannel(final SocketChannel ch) {
                             ch.pipeline()
+                                    .addLast(loggingHandler)
                                     .addLast(new MessageFrameDecoder())
                                     .addLast(new MessageFrameEncoder())
                                     .addLast(new MessageRequestDecoder())
                                     .addLast(new MessageResponseEncoder())
-                                    .addLast(new MessageHandler())
-                                    .addLast(loggingHandler);
+                                    .addLast(new MessageHandler());
                         }
                     })
                     // set connections queue size

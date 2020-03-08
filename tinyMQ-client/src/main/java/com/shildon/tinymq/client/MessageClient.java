@@ -48,12 +48,12 @@ public class MessageClient {
                         @Override
                         protected void initChannel(final SocketChannel ch) {
                             ch.pipeline()
+                                    .addLast(loggingHandler)
                                     .addLast(new MessageFrameDecoder())
                                     .addLast(new MessageFrameEncoder())
                                     .addLast(new MessageResponseDecoder())
                                     .addLast(new MessageRequestEncoder())
-                                    .addLast(new MessageHandler())
-                                    .addLast(loggingHandler);
+                                    .addLast(new MessageHandler());
                         }
                     })
                     .option(ChannelOption.TCP_NODELAY, true);

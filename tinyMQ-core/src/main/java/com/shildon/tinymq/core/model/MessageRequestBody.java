@@ -20,12 +20,18 @@ public class MessageRequestBody {
 
     public void decode(final ByteBuf byteBuf) {
         final int size = byteBuf.writerIndex() - byteBuf.readerIndex();
+        if (size <= 0) {
+            return;
+        }
         final byte[] data = new byte[size];
         byteBuf.readBytes(data);
         this.serializedData = data;
     }
 
     public void encode(final ByteBuf byteBuf) {
+        if (serializedData == null || serializedData.length == 0) {
+            return;
+        }
         byteBuf.writeBytes(this.serializedData);
     }
 
