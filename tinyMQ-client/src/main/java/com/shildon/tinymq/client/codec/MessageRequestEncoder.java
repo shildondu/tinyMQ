@@ -17,6 +17,7 @@ public class MessageRequestEncoder extends MessageToByteEncoder<MessageRequest> 
     @Override
     protected void encode(ChannelHandlerContext ctx, MessageRequest msg, ByteBuf out) {
         LOGGER.info("start encode request...");
+        LOGGER.info("the request is [{}]", msg);
         final ByteBuf byteBuf = ctx.alloc().buffer();
         msg.encode(byteBuf);
         out.writeBytes(byteBuf);

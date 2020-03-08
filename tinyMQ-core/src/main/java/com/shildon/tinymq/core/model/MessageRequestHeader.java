@@ -10,10 +10,10 @@ public class MessageRequestHeader {
     private int version;
     private int operationCode;
 
-    public MessageRequestHeader(final long id, final int version, final int operationCode) {
+    public MessageRequestHeader(final long id, final int version, final Operation operation) {
         this.id = id;
         this.version = version;
-        this.operationCode = operationCode;
+        this.operationCode = operation.getCode();
     }
 
     public MessageRequestHeader(final ByteBuf byteBuf) {

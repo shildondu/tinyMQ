@@ -6,6 +6,13 @@ package com.shildon.tinymq.core.model;
 public class SubscribeMessageRequestBody {
     private String topic;
 
+    public SubscribeMessageRequestBody() {
+    }
+
+    public SubscribeMessageRequestBody(String topic) {
+        this.topic = topic;
+    }
+
     public String getTopic() {
         return topic;
     }

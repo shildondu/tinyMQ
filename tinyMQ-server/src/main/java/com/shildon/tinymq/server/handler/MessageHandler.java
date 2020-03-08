@@ -1,11 +1,15 @@
 package com.shildon.tinymq.server.handler;
 
+import com.shildon.tinymq.core.RegistryTable;
 import com.shildon.tinymq.core.model.*;
 import com.shildon.tinymq.core.util.ProtostuffSerializeUtils;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * 服务器端处理器
@@ -16,36 +20,34 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandler.class);
 
+    private RegistryTable registryTable = RegistryTable.getInstance();
+
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final MessageRequest messageRequest) {
         LOGGER.info("start handle request -> {}", messageRequest);
         int operationCode = messageRequest.getHeader().getOperationCode();
         Operation operation = Operation.find(operationCode);
         byte[] serializedBody = messageRequest.getBody().getSerializedData();
-        this.handleOperation(operation, serializedBody);
-        // todo supply body
-        MessageResponseHeader messageResponseHeader = new MessageResponseHeader(MessageResponseCode.SUCCESS, messageRequest.getHeader());
-        MessageResponseBody messageResponseBody = new MessageResponseBody();
-        MessageResponse messageResponse = new MessageResponse(messageResponseHeader, messageResponseBody);
-        // todo separate write and flush.
-        ctx.writeAndFlush(messageResponse);
-    }
-
-    private void handleOperation(Operation operation, byte[] serializedBody) {
         switch (operation) {
             case PUBLISH: {
                 PublishMessageRequestBody publishMessageRequestBody = ProtostuffSerializeUtils.deserialize(serializedBody, PublishMessageRequestBody.class);
+                List<Channel> registryChannels = this.registryTable.get(publishMessageRequestBody.getTopic());
+                registryChannels.forEach(registryChannel -> {
+                    // send message to subscribing channel
+                    LOGGER.info("handle each channel: [{}]", registryChannel);
+                    // todo supply body
+                    MessageResponseHeader messageResponseHeader = new MessageResponseHeader(MessageResponseCode.SUCCESS, messageRequest.getHeader());
+                    MessageResponseBody messageResponseBody = new MessageResponseBody();
+                    MessageResponse messageResponse = new MessageResponse(messageResponseHeader, messageResponseBody);
+                    // todo separate write and flush.
+                    registryChannel.writeAndFlush(messageResponse);
+                });
             }
             case SUBSCRIBE: {
                 SubscribeMessageRequestBody subscribeMessageRequestBody = ProtostuffSerializeUtils.deserialize(serializedBody, SubscribeMessageRequestBody.class);
+                this.registryTable.put(subscribeMessageRequestBody.getTopic(), ctx.channel());
             }
         }
-    }
-
-    @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
-        LOGGER.error("handle error!", cause);
-        ctx.close();
     }
 
 }

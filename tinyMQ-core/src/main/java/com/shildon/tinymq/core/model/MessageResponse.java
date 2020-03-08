@@ -28,6 +28,14 @@ public class MessageResponse {
         this.body.encode(byteBuf);
     }
 
+    @Override
+    public String toString() {
+        return "MessageResponse{" +
+                "header=" + header +
+                ", body=" + body +
+                '}';
+    }
+
     public MessageResponseHeader getHeader() {
         return this.header;
     }

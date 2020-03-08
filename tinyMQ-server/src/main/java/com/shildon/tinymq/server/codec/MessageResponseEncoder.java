@@ -19,6 +19,7 @@ public class MessageResponseEncoder extends MessageToByteEncoder<MessageResponse
 	@Override
 	protected void encode(final ChannelHandlerContext ctx, final MessageResponse msg, final ByteBuf out) {
 		LOGGER.info("start encode response...");
+		LOGGER.info("the response is [{}]", msg);
 		final ByteBuf byteBuf = ctx.alloc().buffer();
 		msg.encode(byteBuf);
 		out.writeBytes(byteBuf);

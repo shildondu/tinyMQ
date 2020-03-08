@@ -22,6 +22,7 @@ public class MessageRequestDecoder extends ByteToMessageDecoder {
 	protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) {
 		LOGGER.info("start decode request...");
 		final MessageRequest messageRequest = new MessageRequest(in);
+		LOGGER.info("the request is [{}]", messageRequest);
 		out.add(messageRequest);
 	}
 

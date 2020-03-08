@@ -7,6 +7,14 @@ public class PublishMessageRequestBody {
     private String topic;
     private byte[] serializedMessage;
 
+    public PublishMessageRequestBody() {
+    }
+
+    public PublishMessageRequestBody(String topic, byte[] serializedMessage) {
+        this.topic = topic;
+        this.serializedMessage = serializedMessage;
+    }
+
     public String getTopic() {
         return topic;
     }

@@ -20,6 +20,7 @@ public class MessageResponseDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         LOGGER.info("start decode response....");
         final MessageResponse messageResponse = new MessageResponse(in);
+        LOGGER.info("the response is [{}]", messageResponse);
         out.add(messageResponse);
     }
 

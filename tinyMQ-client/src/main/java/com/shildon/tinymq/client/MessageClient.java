@@ -2,11 +2,10 @@ package com.shildon.tinymq.client;
 
 import com.shildon.tinymq.client.codec.MessageRequestEncoder;
 import com.shildon.tinymq.client.codec.MessageResponseDecoder;
+import com.shildon.tinymq.client.handler.MessageHandler;
 import com.shildon.tinymq.core.codec.MessageFrameDecoder;
 import com.shildon.tinymq.core.codec.MessageFrameEncoder;
 import com.shildon.tinymq.core.model.MessageRequest;
-import com.shildon.tinymq.core.model.MessageRequestBody;
-import com.shildon.tinymq.core.model.MessageRequestHeader;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -28,6 +27,7 @@ public class MessageClient {
     private int port;
 
     private EventLoopGroup workers;
+    // todo use pool
     private Channel channel;
 
     public MessageClient(String host, int port) {
@@ -52,6 +52,7 @@ public class MessageClient {
                                     .addLast(new MessageFrameEncoder())
                                     .addLast(new MessageResponseDecoder())
                                     .addLast(new MessageRequestEncoder())
+                                    .addLast(new MessageHandler())
                                     .addLast(loggingHandler);
                         }
                     })
@@ -74,13 +75,6 @@ public class MessageClient {
         } finally {
             this.workers.shutdownGracefully();
         }
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        MessageClient messageClient = new MessageClient("127.0.0.1", 10101);
-        messageClient.send(new MessageRequest(new MessageRequestHeader(1, 1, 1), new MessageRequestBody("test".getBytes())));
-        Thread.sleep(3000L);
-        messageClient.close();
     }
 
 }
