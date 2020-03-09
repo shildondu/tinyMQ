@@ -2,7 +2,8 @@ package com.shildon.tinymq.server.handler;
 
 import com.shildon.tinymq.core.RegistryTable;
 import com.shildon.tinymq.core.model.*;
-import com.shildon.tinymq.core.util.ProtostuffSerializeUtils;
+import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
+import com.shildon.tinymq.core.serializer.Serializer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -20,6 +21,7 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandler.class);
 
+    private Serializer serializer = new ProtostuffSerializer();
     private RegistryTable registryTable = RegistryTable.getInstance();
 
     @Override
@@ -30,7 +32,7 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> 
         byte[] serializedBody = messageRequest.getBody().getSerializedData();
         switch (operation) {
             case PUBLISH: {
-                PublishMessageRequestBody publishMessageRequestBody = ProtostuffSerializeUtils.deserialize(serializedBody, PublishMessageRequestBody.class);
+                PublishMessageRequestBody publishMessageRequestBody = serializer.deserialize(serializedBody, PublishMessageRequestBody.class);
                 List<Channel> registryChannels = this.registryTable.get(publishMessageRequestBody.getTopic());
                 registryChannels.forEach(registryChannel -> {
                     // send message to subscribing channel
@@ -43,7 +45,7 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> 
                 });
             }
             case SUBSCRIBE: {
-                SubscribeMessageRequestBody subscribeMessageRequestBody = ProtostuffSerializeUtils.deserialize(serializedBody, SubscribeMessageRequestBody.class);
+                SubscribeMessageRequestBody subscribeMessageRequestBody = serializer.deserialize(serializedBody, SubscribeMessageRequestBody.class);
                 this.registryTable.put(subscribeMessageRequestBody.getTopic(), ctx.channel());
             }
         }
