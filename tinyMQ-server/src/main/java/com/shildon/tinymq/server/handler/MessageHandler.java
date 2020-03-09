@@ -35,9 +35,8 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> 
                 registryChannels.forEach(registryChannel -> {
                     // send message to subscribing channel
                     LOGGER.info("handle each channel: [{}]", registryChannel);
-                    // todo supply body
-                    MessageResponseHeader messageResponseHeader = new MessageResponseHeader(MessageResponseCode.SUCCESS, messageRequest.getHeader());
-                    MessageResponseBody messageResponseBody = new MessageResponseBody();
+                    MessageResponseHeader messageResponseHeader = new MessageResponseHeader(MessageResponseCode.MESSAGE, messageRequest.getHeader());
+                    MessageResponseBody messageResponseBody = new MessageResponseBody(publishMessageRequestBody.getSerializedMessage());
                     MessageResponse messageResponse = new MessageResponse(messageResponseHeader, messageResponseBody);
                     // todo separate write and flush.
                     registryChannel.writeAndFlush(messageResponse);

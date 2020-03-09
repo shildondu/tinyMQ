@@ -9,13 +9,11 @@ public class MessageResponseHeader {
     private long id;
     private int code;
     private int version;
-    private int operationCode;
 
-    public MessageResponseHeader(final long id, final int code, final int version, final int operationCode) {
+    public MessageResponseHeader(final long id, final int code, final int version) {
         this.id = id;
         this.code = code;
         this.version = version;
-        this.operationCode = operationCode;
     }
 
     public MessageResponseHeader(final ByteBuf byteBuf) {
@@ -26,21 +24,18 @@ public class MessageResponseHeader {
         this.id = requestHeader.getId();
         this.code = responseCode.getValue();
         this.version = requestHeader.getVersion();
-        this.operationCode = requestHeader.getOperationCode();
     }
 
     public void decode(final ByteBuf byteBuf) {
         this.id = byteBuf.readLong();
         this.code = byteBuf.readInt();
         this.version = byteBuf.readInt();
-        this.operationCode = byteBuf.readInt();
     }
 
     public void encode(final ByteBuf byteBuf) {
         byteBuf.writeLong(this.id);
         byteBuf.writeInt(this.code);
         byteBuf.writeInt(this.version);
-        byteBuf.writeInt(this.operationCode);
     }
 
     public long getId() {
@@ -65,13 +60,5 @@ public class MessageResponseHeader {
 
     public void setVersion(final int version) {
         this.version = version;
-    }
-
-    public int getOperationCode() {
-        return this.operationCode;
-    }
-
-    public void setOperationCode(final int operationCode) {
-        this.operationCode = operationCode;
     }
 }

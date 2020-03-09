@@ -12,7 +12,12 @@ public enum MessageResponseCode {
     /**
      * system error
      */
-    SYSTEM_ERROR(500);
+    SYSTEM_ERROR(500),
+
+    /**
+     * response with message
+     */
+    MESSAGE(600);
 
     private int value;
 
