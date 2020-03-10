@@ -25,28 +25,28 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> 
     private RegistryTable registryTable = RegistryTable.getInstance();
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final MessageRequest messageRequest) {
-        LOGGER.info("start handle request -> {}", messageRequest);
-        int operationCode = messageRequest.getHeader().getOperationCode();
+    protected void channelRead0(final ChannelHandlerContext ctx, final MessageRequest request) {
+        LOGGER.info("start handle request -> {}", request);
+        int operationCode = request.getHeader().getOperationCode();
         Operation operation = Operation.find(operationCode);
-        byte[] serializedBody = messageRequest.getBody().getSerializedData();
+        byte[] serializedBody = request.getBody().getSerializedData();
         switch (operation) {
             case PUBLISH: {
-                PublishMessageRequestBody publishMessageRequestBody = serializer.deserialize(serializedBody, PublishMessageRequestBody.class);
-                List<Channel> registryChannels = this.registryTable.get(publishMessageRequestBody.getTopic());
+                PublishMessageRequestBody publishRequestBody = serializer.deserialize(serializedBody, PublishMessageRequestBody.class);
+                List<Channel> registryChannels = this.registryTable.get(publishRequestBody.getTopic());
                 registryChannels.forEach(registryChannel -> {
                     // send message to subscribing channel
                     LOGGER.info("handle each channel: [{}]", registryChannel);
-                    MessageResponseHeader messageResponseHeader = new MessageResponseHeader(MessageResponseCode.MESSAGE, messageRequest.getHeader());
-                    MessageResponseBody messageResponseBody = new MessageResponseBody(publishMessageRequestBody.getSerializedMessage());
-                    MessageResponse messageResponse = new MessageResponse(messageResponseHeader, messageResponseBody);
+                    MessageResponseHeader responseHeader = new MessageResponseHeader(MessageResponseCode.MESSAGE, request.getHeader());
+                    MessageResponseBody responseBody = new MessageResponseBody(publishRequestBody.getSerializedMessage());
+                    MessageResponse response = new MessageResponse(responseHeader, responseBody);
                     // todo separate write and flush.
-                    registryChannel.writeAndFlush(messageResponse);
+                    registryChannel.writeAndFlush(response);
                 });
             }
             case SUBSCRIBE: {
-                SubscribeMessageRequestBody subscribeMessageRequestBody = serializer.deserialize(serializedBody, SubscribeMessageRequestBody.class);
-                this.registryTable.put(subscribeMessageRequestBody.getTopic(), ctx.channel());
+                SubscribeMessageRequestBody subscribeRequestBody = serializer.deserialize(serializedBody, SubscribeMessageRequestBody.class);
+                this.registryTable.put(subscribeRequestBody.getTopic(), ctx.channel());
             }
         }
     }
