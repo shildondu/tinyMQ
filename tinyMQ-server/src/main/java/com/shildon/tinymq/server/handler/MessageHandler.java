@@ -1,9 +1,9 @@
 package com.shildon.tinymq.server.handler;
 
-import com.shildon.tinymq.core.RegistryTable;
 import com.shildon.tinymq.core.model.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
+import com.shildon.tinymq.server.RegistryChannelTable;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -22,31 +22,33 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandler.class);
 
     private Serializer serializer = new ProtostuffSerializer();
-    private RegistryTable registryTable = RegistryTable.getInstance();
+    private RegistryChannelTable registryChannelTable = RegistryChannelTable.getInstance();
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final MessageRequest request) {
         LOGGER.info("start handle request -> {}", request);
         int operationCode = request.getHeader().getOperationCode();
         Operation operation = Operation.find(operationCode);
-        byte[] serializedBody = request.getBody().getSerializedData();
+        byte[] serializedRequestBody = request.getBody().getSerializedData();
         switch (operation) {
             case PUBLISH: {
-                PublishMessageRequestBody publishRequestBody = serializer.deserialize(serializedBody, PublishMessageRequestBody.class);
-                List<Channel> registryChannels = this.registryTable.get(publishRequestBody.getTopic());
+                PublishMessageRequestBody requestBody = this.serializer.deserialize(serializedRequestBody, PublishMessageRequestBody.class);
+                List<Channel> registryChannels = this.registryChannelTable.get(requestBody.getTopic());
                 registryChannels.forEach(registryChannel -> {
                     // send message to subscribing channel
                     LOGGER.info("handle each channel: [{}]", registryChannel);
                     MessageResponseHeader responseHeader = new MessageResponseHeader(MessageResponseCode.MESSAGE, request.getHeader());
-                    MessageResponseBody responseBody = new MessageResponseBody(publishRequestBody.getSerializedMessage());
-                    MessageResponse response = new MessageResponse(responseHeader, responseBody);
+                    SubscribeMessageResponseBody responseBody = new SubscribeMessageResponseBody(requestBody.getTopic(), requestBody.getSerializedMessage());
+                    byte[] serializedResponseBody = this.serializer.serialize(responseBody);
+                    MessageResponseBody wrappedResponseBody = new MessageResponseBody(serializedResponseBody);
+                    MessageResponse response = new MessageResponse(responseHeader, wrappedResponseBody);
                     // todo separate write and flush.
                     registryChannel.writeAndFlush(response);
                 });
             }
             case SUBSCRIBE: {
-                SubscribeMessageRequestBody subscribeRequestBody = serializer.deserialize(serializedBody, SubscribeMessageRequestBody.class);
-                this.registryTable.put(subscribeRequestBody.getTopic(), ctx.channel());
+                SubscribeMessageRequestBody subscribeRequestBody = serializer.deserialize(serializedRequestBody, SubscribeMessageRequestBody.class);
+                this.registryChannelTable.put(subscribeRequestBody.getTopic(), ctx.channel());
             }
         }
     }

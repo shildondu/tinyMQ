@@ -1,4 +1,4 @@
-package com.shildon.tinymq.core;
+package com.shildon.tinymq.server;
 
 import io.netty.channel.Channel;
 
@@ -10,17 +10,16 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author shildon
  */
-public final class RegistryTable {
+public final class RegistryChannelTable {
 
-    private static final RegistryTable INSTANCE = new RegistryTable();
+    private static final RegistryChannelTable INSTANCE = new RegistryChannelTable();
 
-    // todo confirm mapping channel or event loop or others?
     private Map<String, List<Channel>> registryMap = new ConcurrentHashMap<>();
 
-    private RegistryTable() {
+    private RegistryChannelTable() {
     }
 
-    public static RegistryTable getInstance() {
+    public static RegistryChannelTable getInstance() {
         return INSTANCE;
     }
 

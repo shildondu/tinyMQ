@@ -7,6 +7,14 @@ public final class Configuration {
     private String host;
     private int port;
 
+    @Override
+    public String toString() {
+        return "Configuration{" +
+                "host='" + host + '\'' +
+                ", port=" + port +
+                '}';
+    }
+
     public String getHost() {
         return host;
     }

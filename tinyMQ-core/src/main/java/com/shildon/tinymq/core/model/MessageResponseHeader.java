@@ -38,6 +38,15 @@ public class MessageResponseHeader {
         byteBuf.writeInt(this.version);
     }
 
+    @Override
+    public String toString() {
+        return "MessageResponseHeader{" +
+                "id=" + id +
+                ", code=" + code +
+                ", version=" + version +
+                '}';
+    }
+
     public long getId() {
         return this.id;
     }
