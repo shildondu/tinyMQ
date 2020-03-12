@@ -1,5 +1,9 @@
 package com.shildon.tinymq.client;
 
+import com.shildon.tinymq.client.publisher.Publisher;
+import com.shildon.tinymq.client.publisher.PublisherFactory;
+import com.shildon.tinymq.client.subscriber.Subscriber;
+import com.shildon.tinymq.client.subscriber.SubscriberFactory;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
 
@@ -13,8 +17,8 @@ public final class MessageRepl {
     public static void main(String[] args) {
         Serializer serializer = new ProtostuffSerializer();
         MessageClient messageClient = MessageClient.getInstance();
-        Publisher<String> publisher = new Publisher<>(serializer);
-        Subscriber<String> subscriber = Subscriber.create(serializer);
+        Publisher<String> publisher = PublisherFactory.create(serializer);
+        Subscriber<String> subscriber = SubscriberFactory.create(serializer);
         Scanner scanner = new Scanner(System.in);
         String line = "";
         while (!"exit".equals(line)) {

@@ -1,5 +1,7 @@
-package com.shildon.tinymq.client;
+package com.shildon.tinymq.client.subscriber;
 
+import com.shildon.tinymq.client.MessageClient;
+import com.shildon.tinymq.client.RegistryConsumerTable;
 import com.shildon.tinymq.core.constant.Constant;
 import com.shildon.tinymq.core.model.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
@@ -21,12 +23,7 @@ public class Subscriber<T> {
     private Class<T> genericType;
     private RegistryConsumerTable registryConsumerTable = RegistryConsumerTable.getInstance();
 
-    public static <T> Subscriber<T> create(Serializer serializer) {
-        return new Subscriber<T>(serializer) {
-        };
-    }
-
-    private Subscriber(Serializer serializer) {
+    Subscriber(Serializer serializer) {
         this.serializer = serializer;
         this.initGenericType();
     }

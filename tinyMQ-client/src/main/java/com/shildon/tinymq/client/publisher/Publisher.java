@@ -1,5 +1,6 @@
-package com.shildon.tinymq.client;
+package com.shildon.tinymq.client.publisher;
 
+import com.shildon.tinymq.client.MessageClient;
 import com.shildon.tinymq.core.constant.Constant;
 import com.shildon.tinymq.core.model.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
@@ -15,7 +16,7 @@ public class Publisher<T> {
     private Serializer serializer;
     private Serializer defaultSerializer = new ProtostuffSerializer();
 
-    public Publisher(Serializer serializer) {
+    Publisher(Serializer serializer) {
         this.serializer = serializer;
     }
 
