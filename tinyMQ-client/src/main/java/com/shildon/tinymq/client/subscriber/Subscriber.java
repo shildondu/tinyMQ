@@ -8,8 +8,6 @@ import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
 import io.netty.channel.Channel;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.function.Consumer;
 
 /**
@@ -18,14 +16,14 @@ import java.util.function.Consumer;
 public class Subscriber<T> {
 
     private MessageClient messageClient = MessageClient.getInstance();
-    private Serializer serializer;
-    private Serializer defaultSerializer = new ProtostuffSerializer();
-    private Class<T> genericType;
     private RegistryConsumerTable registryConsumerTable = RegistryConsumerTable.getInstance();
+    private Serializer defaultSerializer = new ProtostuffSerializer();
+    private Serializer serializer;
+    private Class<T> genericType;
 
-    Subscriber(Serializer serializer) {
+    Subscriber(Class<T> genericType, Serializer serializer) {
         this.serializer = serializer;
-        this.initGenericType();
+        this.genericType = genericType;
     }
 
     public void subscribe(String topic, Consumer<T> consumer) throws Exception {
@@ -33,7 +31,7 @@ public class Subscriber<T> {
         try {
             MessageRequestHeader requestHeader = new MessageRequestHeader(System.currentTimeMillis(), Constant.CURRENT_PROTOCOL_VERSION, Operation.SUBSCRIBE);
             SubscribeMessageRequestBody requestBody = new SubscribeMessageRequestBody(topic);
-            byte[] serializedData = serializer.serialize(requestBody);
+            byte[] serializedData = this.defaultSerializer.serialize(requestBody);
             MessageRequestBody wrappedRequestBody = new MessageRequestBody(serializedData);
             MessageRequest request = new MessageRequest(requestHeader, wrappedRequestBody);
             channel.writeAndFlush(request);
@@ -45,13 +43,6 @@ public class Subscriber<T> {
             registryConsumerTable.put(topic, wrappedConsumer);
         } finally {
             messageClient.returnChannel(channel);
-        }
-    }
-
-    private void initGenericType() {
-        Type genericSuperclass = this.getClass().getGenericSuperclass();
-        if (genericSuperclass instanceof ParameterizedType) {
-            this.genericType = (Class<T>) ((ParameterizedType) genericSuperclass).getActualTypeArguments()[0];
         }
     }
 

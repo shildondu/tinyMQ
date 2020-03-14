@@ -18,7 +18,7 @@ public final class MessageRepl {
         Serializer serializer = new ProtostuffSerializer();
         MessageClient messageClient = MessageClient.getInstance();
         Publisher<String> publisher = PublisherFactory.create(serializer);
-        Subscriber<String> subscriber = SubscriberFactory.create(serializer);
+        Subscriber<String> subscriber = SubscriberFactory.create(String.class, serializer);
         Scanner scanner = new Scanner(System.in);
         String line = "";
         while (!"exit".equals(line)) {

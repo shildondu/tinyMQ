@@ -7,9 +7,8 @@ import com.shildon.tinymq.core.serializer.Serializer;
  */
 public class SubscriberFactory {
 
-    public static <T> Subscriber<T> create(Serializer serializer) {
-        return new Subscriber<T>(serializer) {
-        };
+    public static <T> Subscriber<T> create(Class<T> type, Serializer serializer) {
+        return new Subscriber<>(type, serializer);
     }
 
 }
