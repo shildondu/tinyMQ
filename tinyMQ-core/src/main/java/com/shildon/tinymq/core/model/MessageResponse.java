@@ -14,6 +14,10 @@ public class MessageResponse {
         this.body = body;
     }
 
+    public MessageResponse(final MessageResponseHeader header) {
+        this.header = header;
+    }
+
     public MessageResponse(final ByteBuf byteBuf) {
         this.decode(byteBuf);
     }

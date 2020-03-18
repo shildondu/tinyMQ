@@ -1,5 +1,6 @@
 package com.shildon.tinymq.client.handler;
 
+import com.shildon.tinymq.client.MessageCache;
 import com.shildon.tinymq.client.RegistryConsumerTable;
 import com.shildon.tinymq.core.model.MessageResponse;
 import com.shildon.tinymq.core.model.MessageResponseCode;
@@ -23,6 +24,7 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageResponse>
 
     private Serializer defaultSerializer = new ProtostuffSerializer();
     private RegistryConsumerTable registryConsumerTable = RegistryConsumerTable.getInstance();
+    private MessageCache messageCache = MessageCache.getInstance();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MessageResponse response) {
@@ -35,8 +37,10 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageResponse>
                 List<Consumer<SubscribeMessageResponseBody>> consumers = this.registryConsumerTable.get(responseBody.getTopic());
                 consumers.forEach(it -> it.accept(responseBody));
             }
-            case SUCCESS: {
-
+            case ACK: {
+                String messageId = String.valueOf(response.getHeader().getId());
+                this.messageCache.remove(messageId);
+                // todo callback
             }
             case SYSTEM_ERROR: {
 

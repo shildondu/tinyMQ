@@ -1,6 +1,5 @@
 package com.shildon.tinymq.client;
 
-import com.shildon.tinymq.core.model.MessageResponse;
 import com.shildon.tinymq.core.model.SubscribeMessageResponseBody;
 
 import java.util.ArrayList;

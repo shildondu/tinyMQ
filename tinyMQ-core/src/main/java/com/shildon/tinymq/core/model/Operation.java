@@ -13,19 +13,17 @@ public enum Operation {
     /**
      * publish
      */
-    PUBLISH(1, PublishMessageRequestBody.class),
+    PUBLISH(1),
 
     /**
      * subscribe
      */
-    SUBSCRIBE(2, SubscribeMessageRequestBody.class);
+    SUBSCRIBE(2);
 
     private final int code;
-    private final Class<?> bodyType;
 
-    Operation(final int code, final Class<?> bodyType) {
+    Operation(final int code) {
         this.code = code;
-        this.bodyType = bodyType;
     }
 
     public static Operation find(final int code) {
@@ -38,10 +36,6 @@ public enum Operation {
 
     public int getCode() {
         return this.code;
-    }
-
-    public Class<?> getBodyType() {
-        return this.bodyType;
     }
 
 }

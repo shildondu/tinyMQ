@@ -8,9 +8,9 @@ import java.util.List;
  */
 public enum MessageResponseCode {
     /**
-     * success
+     * ack
      */
-    SUCCESS(200),
+    ACK(200),
 
     /**
      * system error

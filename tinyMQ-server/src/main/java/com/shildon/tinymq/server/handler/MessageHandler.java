@@ -34,17 +34,20 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> 
             case PUBLISH: {
                 PublishMessageRequestBody requestBody = this.serializer.deserialize(serializedRequestBody, PublishMessageRequestBody.class);
                 List<Channel> registryChannels = this.registryChannelTable.get(requestBody.getTopic());
+                // send message to subscribing channel todo it must be sent to topic
                 registryChannels.forEach(registryChannel -> {
-                    // send message to subscribing channel
                     LOGGER.info("handle each channel: [{}]", registryChannel);
                     MessageResponseHeader responseHeader = new MessageResponseHeader(MessageResponseCode.MESSAGE, request.getHeader());
                     SubscribeMessageResponseBody responseBody = new SubscribeMessageResponseBody(requestBody.getTopic(), requestBody.getSerializedMessage());
                     byte[] serializedResponseBody = this.serializer.serialize(responseBody);
                     MessageResponseBody wrappedResponseBody = new MessageResponseBody(serializedResponseBody);
                     MessageResponse response = new MessageResponse(responseHeader, wrappedResponseBody);
-                    // todo separate write and flush.
                     registryChannel.writeAndFlush(response);
                 });
+                // send ack
+                MessageResponseHeader responseHeader = new MessageResponseHeader(MessageResponseCode.ACK, request.getHeader());
+                MessageResponse messageResponse = new MessageResponse(responseHeader);
+                ctx.channel().writeAndFlush(messageResponse);
             }
             case SUBSCRIBE: {
                 SubscribeMessageRequestBody subscribeRequestBody = serializer.deserialize(serializedRequestBody, SubscribeMessageRequestBody.class);
