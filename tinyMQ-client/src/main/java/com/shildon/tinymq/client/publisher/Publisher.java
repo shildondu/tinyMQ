@@ -2,6 +2,7 @@ package com.shildon.tinymq.client.publisher;
 
 import com.shildon.tinymq.client.MessageCache;
 import com.shildon.tinymq.client.MessageClient;
+import com.shildon.tinymq.client.MessageRetryer;
 import com.shildon.tinymq.core.protocol.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
@@ -17,6 +18,7 @@ public class Publisher<T> {
     private Serializer serializer;
     private Serializer defaultSerializer = new ProtostuffSerializer();
     private MessageCache messageCache = MessageCache.getInstance();
+    private MessageRetryer messageRetryer = MessageRetryer.getInstance();
 
     Publisher(Serializer serializer) {
         this.serializer = serializer;
@@ -37,6 +39,7 @@ public class Publisher<T> {
         } finally {
             messageClient.returnChannel(channel);
             messageCache.put(request);
+            messageRetryer.retry();
         }
     }
 

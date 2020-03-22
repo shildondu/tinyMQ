@@ -2,11 +2,10 @@ package com.shildon.tinymq.client.handler;
 
 import com.shildon.tinymq.client.MessageCache;
 import com.shildon.tinymq.client.RegistryConsumerTable;
-import com.shildon.tinymq.core.protocol.MessageProtocol;
-import com.shildon.tinymq.core.protocol.MessageType;
-import com.shildon.tinymq.core.protocol.PublishMessageBody;
+import com.shildon.tinymq.core.protocol.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
+import com.shildon.tinymq.core.util.MessageIdUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -36,11 +35,19 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageProtocol>
                 PublishMessageBody publishMessageBody = this.defaultSerializer.deserialize(wrappedSerializedData, PublishMessageBody.class);
                 List<Consumer<PublishMessageBody>> consumers = this.registryConsumerTable.get(publishMessageBody.getTopic());
                 consumers.forEach(it -> it.accept(publishMessageBody));
+
+                // send ack
+                MessageHeader header = new MessageHeader();
+                header.setMessageType(MessageType.ACK.getValue());
+                header.setMessageId(MessageIdUtils.generate());
+
+                MessageBody body = new MessageBody();
+                MessageProtocol ack = new MessageProtocol(header, body);
+                ctx.channel().writeAndFlush(ack);
             }
             case ACK: {
                 String messageId = String.valueOf(response.getHeader().getMessageId());
                 this.messageCache.remove(messageId);
-                // todo callback
             }
         }
     }
