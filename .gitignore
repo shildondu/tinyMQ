@@ -2,13 +2,9 @@
 .settings
 .project
 target
-src/test
 tinyMQ-core/.settings
 tinyMQ-server/.settings
 tinyMQ-client/.settings
-tinyMQ-core/src/test
-tinyMQ-server/test
-tinyMQ-client/test
 tinyMQ-core/.classpath
 tinyMQ-server/.classpath
 tinyMQ-client/.classpath
