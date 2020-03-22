@@ -2,9 +2,9 @@ package com.shildon.tinymq.client.handler;
 
 import com.shildon.tinymq.client.MessageCache;
 import com.shildon.tinymq.client.RegistryConsumerTable;
-import com.shildon.tinymq.core.model.MessageResponse;
-import com.shildon.tinymq.core.model.MessageResponseCode;
-import com.shildon.tinymq.core.model.SubscribeMessageResponseBody;
+import com.shildon.tinymq.core.protocol.MessageProtocol;
+import com.shildon.tinymq.core.protocol.MessageType;
+import com.shildon.tinymq.core.protocol.PublishMessageBody;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
 import io.netty.channel.ChannelHandlerContext;
@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 /**
  * @author shildon
  */
-public class MessageHandler extends SimpleChannelInboundHandler<MessageResponse> {
+public class MessageHandler extends SimpleChannelInboundHandler<MessageProtocol> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandler.class);
 
@@ -27,23 +27,20 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageResponse>
     private MessageCache messageCache = MessageCache.getInstance();
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, MessageResponse response) {
+    protected void channelRead0(ChannelHandlerContext ctx, MessageProtocol response) {
         LOGGER.info("handle message: [{}]", response);
-        MessageResponseCode responseCode = MessageResponseCode.find(response.getHeader().getCode());
-        switch (responseCode) {
-            case MESSAGE: {
+        MessageType messageType = MessageType.find(response.getHeader().getMessageType());
+        switch (messageType) {
+            case PUBLISH: {
                 byte[] wrappedSerializedData = response.getBody().getSerializedData();
-                SubscribeMessageResponseBody responseBody = this.defaultSerializer.deserialize(wrappedSerializedData, SubscribeMessageResponseBody.class);
-                List<Consumer<SubscribeMessageResponseBody>> consumers = this.registryConsumerTable.get(responseBody.getTopic());
-                consumers.forEach(it -> it.accept(responseBody));
+                PublishMessageBody publishMessageBody = this.defaultSerializer.deserialize(wrappedSerializedData, PublishMessageBody.class);
+                List<Consumer<PublishMessageBody>> consumers = this.registryConsumerTable.get(publishMessageBody.getTopic());
+                consumers.forEach(it -> it.accept(publishMessageBody));
             }
             case ACK: {
-                String messageId = String.valueOf(response.getHeader().getId());
+                String messageId = String.valueOf(response.getHeader().getMessageId());
                 this.messageCache.remove(messageId);
                 // todo callback
-            }
-            case SYSTEM_ERROR: {
-
             }
         }
     }

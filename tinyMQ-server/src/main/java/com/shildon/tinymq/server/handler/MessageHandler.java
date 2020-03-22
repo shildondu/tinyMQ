@@ -1,8 +1,9 @@
 package com.shildon.tinymq.server.handler;
 
-import com.shildon.tinymq.core.model.*;
+import com.shildon.tinymq.core.protocol.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
+import com.shildon.tinymq.core.util.MessageIdUtils;
 import com.shildon.tinymq.server.RegistryChannelTable;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,7 +18,7 @@ import java.util.List;
  *
  * @author shildon
  */
-public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> {
+public class MessageHandler extends SimpleChannelInboundHandler<MessageProtocol> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandler.class);
 
@@ -25,33 +26,39 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageRequest> 
     private RegistryChannelTable registryChannelTable = RegistryChannelTable.getInstance();
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final MessageRequest request) {
+    protected void channelRead0(final ChannelHandlerContext ctx, final MessageProtocol request) {
         LOGGER.info("start handle request -> {}", request);
-        int operationCode = request.getHeader().getOperationCode();
-        Operation operation = Operation.find(operationCode);
+        int type = request.getHeader().getMessageType();
+        MessageType messageType = MessageType.find(type);
         byte[] serializedRequestBody = request.getBody().getSerializedData();
-        switch (operation) {
+        switch (messageType) {
             case PUBLISH: {
-                PublishMessageRequestBody requestBody = this.serializer.deserialize(serializedRequestBody, PublishMessageRequestBody.class);
-                List<Channel> registryChannels = this.registryChannelTable.get(requestBody.getTopic());
+                PublishMessageBody publishMessageBody = this.serializer.deserialize(serializedRequestBody, PublishMessageBody.class);
+                List<Channel> registryChannels = this.registryChannelTable.get(publishMessageBody.getTopic());
                 // send message to subscribing channel todo it must be sent to topic
                 registryChannels.forEach(registryChannel -> {
                     LOGGER.info("handle each channel: [{}]", registryChannel);
-                    MessageResponseHeader responseHeader = new MessageResponseHeader(MessageResponseCode.MESSAGE, request.getHeader());
-                    SubscribeMessageResponseBody responseBody = new SubscribeMessageResponseBody(requestBody.getTopic(), requestBody.getSerializedMessage());
-                    byte[] serializedResponseBody = this.serializer.serialize(responseBody);
-                    MessageResponseBody wrappedResponseBody = new MessageResponseBody(serializedResponseBody);
-                    MessageResponse response = new MessageResponse(responseHeader, wrappedResponseBody);
-                    registryChannel.writeAndFlush(response);
+
+                    MessageHeader header = new MessageHeader();
+                    header.setMessageId(request.getHeader().getMessageId());
+                    header.setMessageType(MessageType.SUBSCRIBE.getValue());
+
+                    MessageBody body = new MessageBody(serializedRequestBody);
+                    MessageProtocol messageProtocol = new MessageProtocol(header, body);
+                    registryChannel.writeAndFlush(messageProtocol);
                 });
                 // send ack
-                MessageResponseHeader responseHeader = new MessageResponseHeader(MessageResponseCode.ACK, request.getHeader());
-                MessageResponse messageResponse = new MessageResponse(responseHeader);
-                ctx.channel().writeAndFlush(messageResponse);
+                MessageHeader header = new MessageHeader();
+                header.setMessageType(MessageType.ACK.getValue());
+                header.setMessageId(MessageIdUtils.generate());
+
+                MessageBody body = new MessageBody();
+                MessageProtocol messageProtocol = new MessageProtocol(header, body);
+                ctx.channel().writeAndFlush(messageProtocol);
             }
             case SUBSCRIBE: {
-                SubscribeMessageRequestBody subscribeRequestBody = serializer.deserialize(serializedRequestBody, SubscribeMessageRequestBody.class);
-                this.registryChannelTable.put(subscribeRequestBody.getTopic(), ctx.channel());
+                SubscribeMessageBody subscribeMessageBody = serializer.deserialize(serializedRequestBody, SubscribeMessageBody.class);
+                this.registryChannelTable.put(subscribeMessageBody.getTopic(), ctx.channel());
             }
         }
     }

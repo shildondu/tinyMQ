@@ -2,10 +2,10 @@ package com.shildon.tinymq.client.publisher;
 
 import com.shildon.tinymq.client.MessageCache;
 import com.shildon.tinymq.client.MessageClient;
-import com.shildon.tinymq.core.constant.Constant;
-import com.shildon.tinymq.core.model.*;
+import com.shildon.tinymq.core.protocol.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
+import com.shildon.tinymq.core.util.MessageIdUtils;
 import io.netty.channel.Channel;
 
 /**
@@ -25,11 +25,13 @@ public class Publisher<T> {
     public void publish(String topic, T message) throws Exception {
         Channel channel = messageClient.borrowChannel();
         byte[] serializedMessage = this.serializer.serialize(message);
-        MessageRequestHeader requestHeader = new MessageRequestHeader(System.currentTimeMillis(), Constant.CURRENT_PROTOCOL_VERSION, Operation.PUBLISH);
-        PublishMessageRequestBody requestBody = new PublishMessageRequestBody(topic, serializedMessage);
+        MessageHeader header = new MessageHeader();
+        header.setMessageType(MessageType.PUBLISH.getValue());
+        header.setMessageId(MessageIdUtils.generate());
+        PublishMessageBody requestBody = new PublishMessageBody(topic, serializedMessage);
         byte[] serializedBody = this.defaultSerializer.serialize(requestBody);
-        MessageRequestBody wrappedRequestBody = new MessageRequestBody(serializedBody);
-        MessageRequest request = new MessageRequest(requestHeader, wrappedRequestBody);
+        MessageBody wrappedBody = new MessageBody(serializedBody);
+        MessageProtocol request = new MessageProtocol(header, wrappedBody);
         try {
             channel.writeAndFlush(request);
         } finally {

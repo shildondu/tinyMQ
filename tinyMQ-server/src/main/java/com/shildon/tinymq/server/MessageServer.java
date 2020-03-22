@@ -1,9 +1,9 @@
 package com.shildon.tinymq.server;
 
-import com.shildon.tinymq.server.codec.MessageRequestDecoder;
-import com.shildon.tinymq.server.codec.MessageResponseEncoder;
 import com.shildon.tinymq.core.codec.MessageFrameDecoder;
 import com.shildon.tinymq.core.codec.MessageFrameEncoder;
+import com.shildon.tinymq.core.codec.MessageProtocolDecoder;
+import com.shildon.tinymq.core.codec.MessageProtocolEncoder;
 import com.shildon.tinymq.server.handler.MessageHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -49,8 +49,8 @@ public class MessageServer {
                                     .addLast(loggingHandler)
                                     .addLast(new MessageFrameDecoder())
                                     .addLast(new MessageFrameEncoder())
-                                    .addLast(new MessageRequestDecoder())
-                                    .addLast(new MessageResponseEncoder())
+                                    .addLast(new MessageProtocolDecoder())
+                                    .addLast(new MessageProtocolEncoder())
                                     .addLast(new MessageHandler());
                         }
                     })

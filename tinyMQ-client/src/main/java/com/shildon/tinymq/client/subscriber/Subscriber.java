@@ -2,10 +2,10 @@ package com.shildon.tinymq.client.subscriber;
 
 import com.shildon.tinymq.client.MessageClient;
 import com.shildon.tinymq.client.RegistryConsumerTable;
-import com.shildon.tinymq.core.constant.Constant;
-import com.shildon.tinymq.core.model.*;
+import com.shildon.tinymq.core.protocol.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
+import com.shildon.tinymq.core.util.MessageIdUtils;
 import io.netty.channel.Channel;
 
 import java.util.function.Consumer;
@@ -29,13 +29,16 @@ public class Subscriber<T> {
     public void subscribe(String topic, Consumer<T> consumer) throws Exception {
         Channel channel = messageClient.borrowChannel();
         try {
-            MessageRequestHeader requestHeader = new MessageRequestHeader(System.currentTimeMillis(), Constant.CURRENT_PROTOCOL_VERSION, Operation.SUBSCRIBE);
-            SubscribeMessageRequestBody requestBody = new SubscribeMessageRequestBody(topic);
-            byte[] serializedData = this.defaultSerializer.serialize(requestBody);
-            MessageRequestBody wrappedRequestBody = new MessageRequestBody(serializedData);
-            MessageRequest request = new MessageRequest(requestHeader, wrappedRequestBody);
+            MessageHeader header = new MessageHeader();
+            header.setMessageId(MessageIdUtils.generate());
+            header.setMessageType(MessageType.SUBSCRIBE.getValue());
+            // todo use configuration of group
+            SubscribeMessageBody subscribeMessageBody = new SubscribeMessageBody(topic, "");
+            byte[] serializedData = this.defaultSerializer.serialize(subscribeMessageBody);
+            MessageBody body = new MessageBody(serializedData);
+            MessageProtocol request = new MessageProtocol(header, body);
             channel.writeAndFlush(request);
-            Consumer<SubscribeMessageResponseBody> wrappedConsumer = responseBody -> {
+            Consumer<PublishMessageBody> wrappedConsumer = responseBody -> {
                 byte[] serializedMessage = responseBody.getSerializedMessage();
                 T message = serializer.deserialize(serializedMessage, this.genericType);
                 consumer.accept(message);

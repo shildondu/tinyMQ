@@ -1,5 +1,6 @@
 package com.shildon.tinymq.core.protocol;
 
+import com.shildon.tinymq.core.constant.Constant;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;
@@ -11,13 +12,13 @@ import java.nio.charset.StandardCharsets;
  */
 public class MessageHeader {
     // 4byte version
-    private int version;
+    private int version = Constant.CURRENT_PROTOCOL_VERSION;
     // 16byte messageId
     private String messageId;
     // 4byte message type
     private int messageType;
     // 8byte timestamp
-    private long timestamp;
+    private long timestamp = System.currentTimeMillis();
 
     public MessageHeader() {
 

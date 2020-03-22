@@ -10,6 +10,12 @@ public class SubscribeMessageBody {
     private String group;
 
     public SubscribeMessageBody() {
+
+    }
+
+    public SubscribeMessageBody(String topic, String group) {
+        this.topic = topic;
+        this.group = group;
     }
 
     @Override
@@ -18,10 +24,6 @@ public class SubscribeMessageBody {
                 "topic='" + topic + '\'' +
                 ", group='" + group + '\'' +
                 '}';
-    }
-
-    public SubscribeMessageBody(String topic) {
-        this.topic = topic;
     }
 
     public String getTopic() {

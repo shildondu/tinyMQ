@@ -1,6 +1,6 @@
 package com.shildon.tinymq.client;
 
-import com.shildon.tinymq.core.model.SubscribeMessageResponseBody;
+import com.shildon.tinymq.core.protocol.PublishMessageBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ public final class RegistryConsumerTable {
 
     private static final RegistryConsumerTable INSTANCE = new RegistryConsumerTable();
 
-    private Map<String, List<Consumer<SubscribeMessageResponseBody>>> registryMap = new ConcurrentHashMap<>();
+    private Map<String, List<Consumer<PublishMessageBody>>> registryMap = new ConcurrentHashMap<>();
 
     private RegistryConsumerTable() {
     }
@@ -24,10 +24,10 @@ public final class RegistryConsumerTable {
         return INSTANCE;
     }
 
-    public <T> void put(String topic, Consumer<SubscribeMessageResponseBody> consumer) {
+    public <T> void put(String topic, Consumer<PublishMessageBody> consumer) {
         this.registryMap.compute(topic, (key, responseConsumers) -> {
             if (responseConsumers == null) {
-                List<Consumer<SubscribeMessageResponseBody>> newResponseConsumers = new ArrayList<>();
+                List<Consumer<PublishMessageBody>> newResponseConsumers = new ArrayList<>();
                 newResponseConsumers.add(consumer);
                 return newResponseConsumers;
             } else {
@@ -37,7 +37,7 @@ public final class RegistryConsumerTable {
         });
     }
 
-    public List<Consumer<SubscribeMessageResponseBody>> get(String topic) {
+    public List<Consumer<PublishMessageBody>> get(String topic) {
         return this.registryMap.getOrDefault(topic, new ArrayList<>());
     }
 

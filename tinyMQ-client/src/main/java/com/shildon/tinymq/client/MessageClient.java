@@ -1,11 +1,11 @@
 package com.shildon.tinymq.client;
 
-import com.shildon.tinymq.client.codec.MessageRequestEncoder;
-import com.shildon.tinymq.client.codec.MessageResponseDecoder;
 import com.shildon.tinymq.client.handler.MessageHandler;
 import com.shildon.tinymq.client.pool.ChannelFactory;
 import com.shildon.tinymq.core.codec.MessageFrameDecoder;
 import com.shildon.tinymq.core.codec.MessageFrameEncoder;
+import com.shildon.tinymq.core.codec.MessageProtocolDecoder;
+import com.shildon.tinymq.core.codec.MessageProtocolEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -55,8 +55,8 @@ public final class MessageClient {
                                 .addLast(loggingHandler)
                                 .addLast(new MessageFrameDecoder())
                                 .addLast(new MessageFrameEncoder())
-                                .addLast(new MessageResponseDecoder())
-                                .addLast(new MessageRequestEncoder())
+                                .addLast(new MessageProtocolDecoder())
+                                .addLast(new MessageProtocolEncoder())
                                 .addLast(new MessageHandler());
                     }
                 })
