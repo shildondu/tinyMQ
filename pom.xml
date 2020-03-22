@@ -14,6 +14,7 @@
         <module>tinyMQ-server</module>
         <module>tinyMQ-client</module>
         <module>tinyMQ-demo</module>
+        <module>tinyMQ-nameserver</module>
     </modules>
 
     <properties>
