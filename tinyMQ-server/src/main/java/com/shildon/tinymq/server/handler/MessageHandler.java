@@ -44,7 +44,7 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageProtocol>
                     LOGGER.info("handle each channel: [{}]", registryChannel);
 
                     MessageHeader header = new MessageHeader();
-                    header.setMessageId(request.getHeader().getMessageId());
+                    header.setMessageId(MessageIdUtils.generate());
                     header.setMessageType(MessageType.PUBLISH.getValue());
 
                     MessageBody body = new MessageBody(serializedRequestBody);
@@ -57,7 +57,7 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageProtocol>
                 // send ack
                 MessageHeader header = new MessageHeader();
                 header.setMessageType(MessageType.ACK.getValue());
-                header.setMessageId(MessageIdUtils.generate());
+                header.setMessageId(request.getHeader().getMessageId());
 
                 MessageBody body = new MessageBody();
                 MessageProtocol ack = new MessageProtocol(header, body);

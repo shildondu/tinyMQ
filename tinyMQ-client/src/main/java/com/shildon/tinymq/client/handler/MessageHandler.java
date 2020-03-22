@@ -5,7 +5,6 @@ import com.shildon.tinymq.client.RegistryConsumerTable;
 import com.shildon.tinymq.core.protocol.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
-import com.shildon.tinymq.core.util.MessageIdUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -39,7 +38,7 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageProtocol>
                 // send ack
                 MessageHeader header = new MessageHeader();
                 header.setMessageType(MessageType.ACK.getValue());
-                header.setMessageId(MessageIdUtils.generate());
+                header.setMessageId(response.getHeader().getMessageId());
 
                 MessageBody body = new MessageBody();
                 MessageProtocol ack = new MessageProtocol(header, body);
