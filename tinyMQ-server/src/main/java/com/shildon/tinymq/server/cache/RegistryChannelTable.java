@@ -1,4 +1,4 @@
-package com.shildon.tinymq.server;
+package com.shildon.tinymq.server.cache;
 
 import io.netty.channel.Channel;
 

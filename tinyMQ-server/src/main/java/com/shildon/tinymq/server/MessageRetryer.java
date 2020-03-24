@@ -2,6 +2,7 @@ package com.shildon.tinymq.server;
 
 import com.shildon.tinymq.core.model.Pair;
 import com.shildon.tinymq.core.protocol.MessageProtocol;
+import com.shildon.tinymq.server.cache.MessageCache;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

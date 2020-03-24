@@ -1,4 +1,4 @@
-package com.shildon.tinymq.server;
+package com.shildon.tinymq.server.cache;
 
 import com.shildon.tinymq.core.model.Pair;
 import com.shildon.tinymq.core.protocol.MessageProtocol;
