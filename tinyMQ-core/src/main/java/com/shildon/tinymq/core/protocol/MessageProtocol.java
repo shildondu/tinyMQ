@@ -11,22 +11,45 @@ public class MessageProtocol {
     private MessageHeader header;
     private MessageBody body;
 
-    public MessageProtocol() {
-
+    private MessageProtocol(Builder builder) {
+        this.header = builder.header;
+        this.body = builder.body;
     }
 
-    public MessageProtocol(MessageHeader header, MessageBody body) {
-        this.header = header;
-        this.body = body;
-    }
-
-    public MessageProtocol(ByteBuf byteBuf) {
+    private MessageProtocol(ByteBuf byteBuf) {
         this.decode(byteBuf);
     }
 
+    public static class Builder {
+        private MessageHeader header;
+        private MessageBody body;
+
+        public Builder header(MessageHeader header) {
+            this.header = header;
+            return this;
+        }
+
+        public Builder body(MessageBody body) {
+            this.body = body;
+            return this;
+        }
+
+        public MessageProtocol build() {
+            return new MessageProtocol(this);
+        }
+    }
+
+    public static class ByteBufBuilder {
+        public MessageProtocol build(ByteBuf byteBuf) {
+            return new MessageProtocol(byteBuf);
+        }
+    }
+
     public void decode(ByteBuf byteBuf) {
-        this.header = new MessageHeader(byteBuf);
-        this.body = new MessageBody(byteBuf);
+        this.header = new MessageHeader.ByteBufBuilder()
+                .build(byteBuf);
+        this.body = new MessageBody.ByteBufBuilder()
+                .build(byteBuf);
     }
 
     public void encode(ByteBuf byteBuf) {
@@ -46,15 +69,7 @@ public class MessageProtocol {
         return header;
     }
 
-    public void setHeader(MessageHeader header) {
-        this.header = header;
-    }
-
     public MessageBody getBody() {
         return body;
-    }
-
-    public void setBody(MessageBody body) {
-        this.body = body;
     }
 }

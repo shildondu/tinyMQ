@@ -1,6 +1,7 @@
 package com.shildon.tinymq.core.protocol;
 
 import com.shildon.tinymq.core.constant.Constant;
+import com.shildon.tinymq.core.util.MessageIdUtils;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;
@@ -12,19 +13,22 @@ import java.nio.charset.StandardCharsets;
  */
 public class MessageHeader {
     // 4byte version
-    private int version = Constant.CURRENT_PROTOCOL_VERSION;
+    private int version;
     // 16byte messageId
     private String messageId;
     // 4byte message type
     private int messageType;
     // 8byte timestamp
-    private long timestamp = System.currentTimeMillis();
+    private long timestamp;
 
-    public MessageHeader() {
-
+    private MessageHeader(Builder builder) {
+        this.version = builder.version;
+        this.messageId = builder.messageId;
+        this.messageType = builder.messageTyp;
+        this.timestamp = builder.timestamp;
     }
 
-    public MessageHeader(ByteBuf byteBuf) {
+    private MessageHeader(ByteBuf byteBuf) {
         this.decode(byteBuf);
     }
 
@@ -43,6 +47,41 @@ public class MessageHeader {
         byteBuf.writeBytes(messageIdBytes);
         byteBuf.writeInt(this.messageType);
         byteBuf.writeLong(this.timestamp);
+    }
+
+    public static class Builder {
+        private int version = Constant.CURRENT_PROTOCOL_VERSION;
+        private String messageId;
+        private int messageTyp;
+        private long timestamp = System.currentTimeMillis();
+
+        public Builder version(int version) {
+            this.version = version;
+            return this;
+        }
+
+        public Builder messageId(String messageId) {
+            this.messageId = messageId;
+            return this;
+        }
+
+        public Builder messageType(MessageType messageType) {
+            this.messageTyp = messageType.getValue();
+            return this;
+        }
+
+        public MessageHeader build() {
+            if (null == messageId || "".equals(messageId.trim())) {
+                this.messageId = MessageIdUtils.generate();
+            }
+            return new MessageHeader(this);
+        }
+    }
+
+    public static class ByteBufBuilder {
+        public MessageHeader build(ByteBuf byteBuf) {
+            return new MessageHeader(byteBuf);
+        }
     }
 
     @Override

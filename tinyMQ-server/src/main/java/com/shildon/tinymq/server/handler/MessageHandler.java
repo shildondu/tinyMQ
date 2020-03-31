@@ -3,9 +3,8 @@ package com.shildon.tinymq.server.handler;
 import com.shildon.tinymq.core.protocol.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
-import com.shildon.tinymq.core.util.MessageIdUtils;
-import com.shildon.tinymq.server.cache.MessageCache;
 import com.shildon.tinymq.server.MessageRetryer;
+import com.shildon.tinymq.server.cache.MessageCache;
 import com.shildon.tinymq.server.cache.RegistryChannelTable;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -43,24 +42,36 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageProtocol>
                 registryChannels.forEach(registryChannel -> {
                     LOGGER.info("handle each channel: [{}]", registryChannel);
 
-                    MessageHeader header = new MessageHeader();
-                    header.setMessageId(MessageIdUtils.generate());
-                    header.setMessageType(MessageType.PUBLISH.getValue());
-
-                    MessageBody body = new MessageBody(serializedRequestBody);
-                    MessageProtocol messageProtocol = new MessageProtocol(header, body);
+                    MessageProtocol messageProtocol = new MessageProtocol.Builder()
+                            .header(
+                                    new MessageHeader.Builder()
+                                            .messageType(MessageType.PUBLISH)
+                                            .build()
+                            )
+                            .body(
+                                    new MessageBody.Builder()
+                                            .serializedData(serializedRequestBody)
+                                            .build()
+                            )
+                            .build();
                     registryChannel.writeAndFlush(messageProtocol);
 
                     messageCache.put(messageProtocol, registryChannel);
                     messageRetryer.retry();
                 });
                 // send ack
-                MessageHeader header = new MessageHeader();
-                header.setMessageType(MessageType.ACK.getValue());
-                header.setMessageId(request.getHeader().getMessageId());
-
-                MessageBody body = new MessageBody();
-                MessageProtocol ack = new MessageProtocol(header, body);
+                MessageProtocol ack = new MessageProtocol.Builder()
+                        .header(
+                                new MessageHeader.Builder()
+                                        .messageType(MessageType.ACK)
+                                        .messageId(request.getHeader().getMessageId())
+                                        .build()
+                        )
+                        .body(
+                                new MessageBody.Builder()
+                                        .build()
+                        )
+                        .build();
                 ctx.channel().writeAndFlush(ack);
             }
             case SUBSCRIBE: {

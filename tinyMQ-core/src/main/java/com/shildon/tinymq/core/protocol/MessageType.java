@@ -19,6 +19,11 @@ public enum MessageType {
     SUBSCRIBE(200),
 
     /**
+     * poll
+     */
+    POLL(201),
+
+    /**
      * ack
      */
     ACK(300);

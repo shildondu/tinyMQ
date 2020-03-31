@@ -36,12 +36,18 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageProtocol>
                 consumers.forEach(it -> it.accept(publishMessageBody));
 
                 // send ack
-                MessageHeader header = new MessageHeader();
-                header.setMessageType(MessageType.ACK.getValue());
-                header.setMessageId(response.getHeader().getMessageId());
-
-                MessageBody body = new MessageBody();
-                MessageProtocol ack = new MessageProtocol(header, body);
+                MessageProtocol ack = new MessageProtocol.Builder()
+                        .header(
+                                new MessageHeader.Builder()
+                                        .messageType(MessageType.ACK)
+                                        .messageId(response.getHeader().getMessageId())
+                                        .build()
+                        )
+                        .body(
+                                new MessageBody.Builder()
+                                        .build()
+                        )
+                        .build();
                 ctx.channel().writeAndFlush(ack);
             }
             case ACK: {

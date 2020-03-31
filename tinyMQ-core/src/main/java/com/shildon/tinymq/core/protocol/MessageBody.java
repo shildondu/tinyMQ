@@ -12,15 +12,11 @@ import java.util.Arrays;
 public class MessageBody {
     private byte[] serializedData;
 
-    public MessageBody() {
-
+    private MessageBody(Builder builder) {
+        this.serializedData = builder.serializedData;
     }
 
-    public MessageBody(final byte[] data) {
-        this.serializedData = data;
-    }
-
-    public MessageBody(final ByteBuf byteBuf) {
+    private MessageBody(final ByteBuf byteBuf) {
         this.decode(byteBuf);
     }
 
@@ -39,6 +35,25 @@ public class MessageBody {
             return;
         }
         byteBuf.writeBytes(this.serializedData);
+    }
+
+    public static class Builder {
+        private byte[] serializedData;
+
+        public Builder serializedData(byte[] serializedData) {
+            this.serializedData = serializedData;
+            return this;
+        }
+
+        public MessageBody build() {
+            return new MessageBody(this);
+        }
+    }
+
+    public static class ByteBufBuilder {
+        public MessageBody build(ByteBuf byteBuf) {
+            return new MessageBody(byteBuf);
+        }
     }
 
     @Override

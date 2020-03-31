@@ -5,7 +5,6 @@ import com.shildon.tinymq.client.RegistryConsumerTable;
 import com.shildon.tinymq.core.protocol.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
-import com.shildon.tinymq.core.util.MessageIdUtils;
 import io.netty.channel.Channel;
 
 import java.util.function.Consumer;
@@ -29,14 +28,21 @@ public class Subscriber<T> {
     public void subscribe(String topic, Consumer<T> consumer) throws Exception {
         Channel channel = messageClient.borrowChannel();
         try {
-            MessageHeader header = new MessageHeader();
-            header.setMessageId(MessageIdUtils.generate());
-            header.setMessageType(MessageType.SUBSCRIBE.getValue());
             // todo use configuration of group
             SubscribeMessageBody subscribeMessageBody = new SubscribeMessageBody(topic, "");
             byte[] serializedData = this.defaultSerializer.serialize(subscribeMessageBody);
-            MessageBody body = new MessageBody(serializedData);
-            MessageProtocol request = new MessageProtocol(header, body);
+            MessageProtocol request = new MessageProtocol.Builder()
+                    .header(
+                            new MessageHeader.Builder()
+                                    .messageType(MessageType.SUBSCRIBE)
+                                    .build()
+                    )
+                    .body(
+                            new MessageBody.Builder()
+                                    .serializedData(serializedData)
+                                    .build()
+                    )
+                    .build();
             channel.writeAndFlush(request);
             Consumer<PublishMessageBody> wrappedConsumer = responseBody -> {
                 byte[] serializedMessage = responseBody.getSerializedMessage();

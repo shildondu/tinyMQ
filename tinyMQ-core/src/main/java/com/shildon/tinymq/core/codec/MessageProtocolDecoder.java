@@ -21,7 +21,8 @@ public class MessageProtocolDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) {
         LOGGER.info("start decode request...");
-        final MessageProtocol messageProtocol = new MessageProtocol(in);
+        final MessageProtocol messageProtocol = new MessageProtocol.ByteBufBuilder()
+                .build(in);
         LOGGER.info("the request is [{}]", messageProtocol);
         out.add(messageProtocol);
     }
