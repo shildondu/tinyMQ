@@ -11,16 +11,10 @@
 
 ## 消息传输协议
 
-![architecture](static/tiny-mq-message-protocol.png)
+![protocol](static/tiny-mq-message-protocol.png)
 
 消息传输协议简单设计，分为header和body，header包括4个字节的版本号version，16个字节的消息id，4个字节的消息类型，8个字节的当前时间戳；body为`protostuff`序列化后的字节数组。
 
-## 可靠性保证
+## 主体流程
 
-## todo list
-
-1. 请求体和响应体的设计
-2. 获取泛型的参数类型的折中方案
-3. 粘包和半包问题netty解法
-4. 客户端基于commons-pool池化管理channel
-5. 发送端发送消息时加入到缓存，接收到ack应答后才删除消息，或者当1分钟后没收到ack时重试发送，来确保消息不丢失
+![main flow](static/tiny-mq-main-flow.png)
