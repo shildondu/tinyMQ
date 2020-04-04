@@ -6,17 +6,12 @@ import com.shildon.tinymq.core.codec.MessageFrameDecoder;
 import com.shildon.tinymq.core.codec.MessageFrameEncoder;
 import com.shildon.tinymq.core.codec.MessageProtocolDecoder;
 import com.shildon.tinymq.core.codec.MessageProtocolEncoder;
-import io.netty.bootstrap.Bootstrap;
+import com.shildon.tinymq.core.transport.Client;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.NettyRuntime;
-import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.internal.SystemPropertyUtil;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -36,19 +31,16 @@ public final class MessageClient {
         return INSTANCE;
     }
 
-    private EventLoopGroup workers;
+    private Client client;
     private Configuration configuration;
     private ChannelFactory channelFactory;
     private ObjectPool<Channel> channelPool;
 
     private MessageClient() {
-        final EventLoopGroup workers = new NioEventLoopGroup(new DefaultThreadFactory("workers"));
-        this.workers = workers;
         final LoggingHandler loggingHandler = new LoggingHandler();
-        final Bootstrap bootstrap = new Bootstrap();
-        bootstrap.group(workers)
-                .channel(NioSocketChannel.class)
-                .handler(new ChannelInitializer<SocketChannel>() {
+        this.client = new Client.Builder()
+                .workerName("message-client-worker")
+                .channelInitializer(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(final SocketChannel ch) {
                         ch.pipeline()
@@ -60,9 +52,9 @@ public final class MessageClient {
                                 .addLast(new MessageHandler());
                     }
                 })
-                .option(ChannelOption.TCP_NODELAY, true);
+                .build();
         this.configuration = this.initConfiguration();
-        this.channelFactory = new ChannelFactory(bootstrap, configuration);
+        this.channelFactory = new ChannelFactory(this.client, this.configuration);
         this.channelPool = this.initChannelPool();
     }
 
@@ -93,11 +85,8 @@ public final class MessageClient {
     }
 
     public void close() {
-        try {
-            this.channelPool.close();
-        } finally {
-            this.workers.shutdownGracefully();
-        }
+        this.channelPool.close();
+        this.client.close();
     }
 
 }

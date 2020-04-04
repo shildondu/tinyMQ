@@ -11,5 +11,10 @@
     <name>tinyMQ-nameserver</name>
 
     <dependencies>
+        <dependency>
+            <groupId>com.shildon</groupId>
+            <artifactId>tinyMQ-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
