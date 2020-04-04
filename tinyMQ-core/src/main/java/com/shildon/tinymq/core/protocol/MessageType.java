@@ -24,9 +24,24 @@ public enum MessageType {
     POLL(201),
 
     /**
+     * get server list
+     */
+    GET_SERVER_LIST(202),
+
+    /**
+     * register server
+     */
+    REGISTER_SERVER(300),
+
+    /**
+     * create topic
+     */
+    CREATE_TOPIC(400),
+
+    /**
      * ack
      */
-    ACK(300);
+    ACK(900);
 
     private int value;
 
