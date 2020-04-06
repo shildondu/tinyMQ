@@ -5,7 +5,7 @@ import com.shildon.tinymq.core.protocol.MessageProtocol;
 import com.shildon.tinymq.core.protocol.MessageType;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
-import com.shildon.tinymq.nameserver.model.ServerInfo;
+import com.shildon.tinymq.core.model.meta.ServerInfo;
 import com.shildon.tinymq.nameserver.registry.ServerInfoRegistry;
 import com.shildon.tinymq.nameserver.registry.impl.ServerInfoRegistryImpl;
 import io.netty.channel.ChannelHandlerContext;

@@ -10,6 +10,8 @@ import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.DefaultThreadFactory;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,7 @@ public final class Server {
     private ServerBootstrap serverBootstrap;
     private EventLoopGroup boss;
     private EventLoopGroup workers;
+    private GenericFutureListener<? extends Future<? super Void>> afterBindListener;
 
     private Server(Builder builder) {
         this.port = builder.port;
@@ -42,11 +45,16 @@ public final class Server {
                 .option(ChannelOption.SO_BACKLOG, 1024)
                 // no delay for sending packet
                 .childOption(ChannelOption.TCP_NODELAY, true);
+        this.afterBindListener = builder.afterBindListener;
     }
 
     public void run() {
         try {
-            final ChannelFuture channelFuture = this.serverBootstrap.bind(this.port).sync();
+            final ChannelFuture channelFuture = this.serverBootstrap
+                    .bind(this.port);
+            if (afterBindListener != null) {
+                channelFuture.addListener(this.afterBindListener);
+            }
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             LOGGER.error("start message server error!", e);
@@ -64,6 +72,7 @@ public final class Server {
         private String workerName;
         private ChannelInitializer<ServerSocketChannel> channelInitializer;
         private ChannelInitializer<SocketChannel> childChannelInitializer;
+        private GenericFutureListener<? extends Future<? super Void>> afterBindListener;
 
         public Builder port(int port) {
             this.port = port;
@@ -97,6 +106,11 @@ public final class Server {
 
         public Builder childHandler(ChannelInitializer<SocketChannel> childChannelInitializer) {
             this.childChannelInitializer = childChannelInitializer;
+            return this;
+        }
+
+        public Builder afterBindListener(GenericFutureListener<? extends Future<? super Void>> afterBindListener) {
+            this.afterBindListener = afterBindListener;
             return this;
         }
 

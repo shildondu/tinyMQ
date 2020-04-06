@@ -46,6 +46,7 @@ public class NameServer {
                     @Override
                     protected void initChannel(SocketChannel ch) {
                         ch.pipeline()
+                                .addLast(loggingHandler)
                                 .addLast(new MessageFrameDecoder())
                                 .addLast(new MessageFrameEncoder())
                                 .addLast(new MessageProtocolDecoder())

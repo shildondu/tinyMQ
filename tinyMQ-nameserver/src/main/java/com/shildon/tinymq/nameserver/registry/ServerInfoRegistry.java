@@ -1,6 +1,6 @@
 package com.shildon.tinymq.nameserver.registry;
 
-import com.shildon.tinymq.nameserver.model.ServerInfo;
+import com.shildon.tinymq.core.model.meta.ServerInfo;
 
 import java.util.List;
 

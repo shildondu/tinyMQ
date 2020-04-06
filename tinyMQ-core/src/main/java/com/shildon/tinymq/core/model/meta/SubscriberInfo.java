@@ -1,4 +1,4 @@
-package com.shildon.tinymq.nameserver.model;
+package com.shildon.tinymq.core.model.meta;
 
 import java.util.List;
 

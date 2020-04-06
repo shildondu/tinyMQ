@@ -15,7 +15,7 @@
         <module>tinyMQ-client</module>
         <module>tinyMQ-demo</module>
         <module>tinyMQ-nameserver</module>
-        <module>admin</module>
+        <module>tinyMQ-admin</module>
     </modules>
 
     <properties>

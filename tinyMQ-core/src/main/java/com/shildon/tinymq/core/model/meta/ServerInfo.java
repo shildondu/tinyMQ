@@ -1,4 +1,4 @@
-package com.shildon.tinymq.nameserver.model;
+package com.shildon.tinymq.core.model.meta;
 
 import java.util.List;
 
@@ -9,6 +9,24 @@ public class ServerInfo {
     private String ip;
     private int port;
     private List<TopicInfo> topicInfos;
+
+    public ServerInfo() {
+
+    }
+
+    public ServerInfo(String ip, int port) {
+        this.ip = ip;
+        this.port = port;
+    }
+
+    @Override
+    public String toString() {
+        return "ServerInfo{" +
+                "ip='" + ip + '\'' +
+                ", port=" + port +
+                ", topicInfos=" + topicInfos +
+                '}';
+    }
 
     public String getIp() {
         return ip;
