@@ -13,7 +13,7 @@ import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
 import com.shildon.tinymq.core.transport.Client;
 import com.shildon.tinymq.core.transport.Server;
-import com.shildon.tinymq.server.configuration.ConfigurationManager;
+import com.shildon.tinymq.server.configuration.ConfigurationHolder;
 import com.shildon.tinymq.server.handler.MessageHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -35,18 +36,26 @@ import java.util.stream.Collectors;
  *
  * @author shildon
  */
-public class Bootstrap {
+public final class Bootstrap {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
 
-    public static void main(String[] args) {
-        runServer();
+    private ConfigurationHolder configurationHolder = ConfigurationHolder.getInstance();
+    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new DefaultThreadFactory("register-scheduler"));
+
+    private Bootstrap() {
+
     }
 
-    private static void runServer() {
+    public static void main(String[] args) {
+        new Bootstrap()
+                .runServer();
+    }
+
+    private void runServer() {
         LoggingHandler loggingHandler = new LoggingHandler();
         new Server.Builder()
-                .port(ConfigurationManager.getPort())
+                .port(this.configurationHolder.getPort())
                 .bossName("message-server-boss")
                 .workerName("message-server-worker")
                 .handler(new ChannelInitializer<ServerSocketChannel>() {
@@ -68,19 +77,17 @@ public class Bootstrap {
                                 .addLast(new MessageHandler());
                     }
                 })
-                .afterBindListener(it -> {
-                    runClient();
-                })
+                .afterBindListener(it -> registerToNameServer())
                 .build()
                 .run();
     }
 
-    private static void runClient() {
+    private void registerToNameServer() {
         Serializer serializer = new ProtostuffSerializer();
         LoggingHandler loggingHandler = new LoggingHandler();
         Client client = new Client.Builder()
                 .workerSize(1)
-                .workerName("message-client-worker")
+                .workerName("register-worker")
                 .channelInitializer(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
@@ -93,7 +100,8 @@ public class Bootstrap {
                     }
                 })
                 .build();
-        List<Channel> channels = ConfigurationManager.getServerInfos()
+
+        List<Channel> channels = this.configurationHolder.getNameServerInfos()
                 .stream()
                 .map(it -> {
                     try {
@@ -105,25 +113,25 @@ public class Bootstrap {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        Executors.newSingleThreadScheduledExecutor(new DefaultThreadFactory("register-server"))
-                .scheduleWithFixedDelay(() ->
-                        channels.forEach(it ->
-                                it.writeAndFlush(
-                                        new MessageProtocol.Builder()
-                                                .header(
-                                                        new MessageHeader.Builder()
-                                                                .messageType(MessageType.REGISTER_SERVER)
-                                                                .build()
-                                                )
-                                                .body(
-                                                        new MessageBody.Builder()
-                                                                .serializedData(serializer.serialize(
-                                                                        new ServerInfo("localhost", ConfigurationManager.getPort())
-                                                                ))
-                                                                .build()
-                                                )
-                                                .build()
-                                )), 3, 10, TimeUnit.SECONDS);
+
+        this.scheduler.scheduleWithFixedDelay(() ->
+                channels.forEach(it ->
+                        it.writeAndFlush(
+                                new MessageProtocol.Builder()
+                                        .header(
+                                                new MessageHeader.Builder()
+                                                        .messageType(MessageType.REGISTER_SERVER)
+                                                        .build()
+                                        )
+                                        .body(
+                                                new MessageBody.Builder()
+                                                        .serializedData(serializer.serialize(
+                                                                new ServerInfo("localhost", this.configurationHolder.getPort())
+                                                        ))
+                                                        .build()
+                                        )
+                                        .build()
+                        )), 3, 10, TimeUnit.SECONDS);
     }
 
 }

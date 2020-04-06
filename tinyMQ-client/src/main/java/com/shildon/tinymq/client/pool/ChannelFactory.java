@@ -1,7 +1,8 @@
 package com.shildon.tinymq.client.pool;
 
-import com.shildon.tinymq.client.Configuration;
 import com.shildon.tinymq.client.MessageClient;
+import com.shildon.tinymq.client.configuration.Configuration;
+import com.shildon.tinymq.client.configuration.ConfigurationHolder;
 import com.shildon.tinymq.core.transport.Client;
 import io.netty.channel.Channel;
 import org.apache.commons.pool2.PooledObject;
@@ -18,16 +19,15 @@ public class ChannelFactory implements PooledObjectFactory<Channel> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageClient.class);
 
     private Client client;
-    private Configuration configuration;
+    private ConfigurationHolder configurationHolder = ConfigurationHolder.getInstance();
 
-    public ChannelFactory(Client client, Configuration configuration) {
+    public ChannelFactory(Client client) {
         this.client = client;
-        this.configuration = configuration;
     }
 
     @Override
     public PooledObject<Channel> makeObject() throws Exception {
-        Channel channel = this.client.connect(configuration.getHost(), configuration.getPort());
+        Channel channel = this.client.connect(configurationHolder.getServerInfos().get(0).getFirst(), configurationHolder.getServerInfos().get(0).getSecond());
         LOGGER.info("connect to server and generate a channel [{}]", channel);
         return new DefaultPooledObject<>(channel);
     }
