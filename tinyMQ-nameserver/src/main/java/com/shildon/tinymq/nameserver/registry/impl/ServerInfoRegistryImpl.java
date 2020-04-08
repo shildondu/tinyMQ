@@ -2,24 +2,40 @@ package com.shildon.tinymq.nameserver.registry.impl;
 
 import com.shildon.tinymq.core.model.meta.ServerInfo;
 import com.shildon.tinymq.nameserver.registry.ServerInfoRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author shildon
  */
 public class ServerInfoRegistryImpl implements ServerInfoRegistry {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerInfoRegistryImpl.class);
+    private final Map<String, ServerInfo> serverInfoMap = new ConcurrentHashMap<>();
+
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     public List<ServerInfo> getAll() {
-        return null;
+        lock.readLock().lock();
+        List<ServerInfo> serverInfos;
+        try {
+            serverInfos = new ArrayList<>(serverInfoMap.values());
+        } finally {
+            lock.readLock().unlock();
+        }
+        return serverInfos;
     }
 
     public void register(ServerInfo serverInfo) {
-        LOGGER.info("" + serverInfo);
+        lock.writeLock().lock();
+        try {
+            serverInfoMap.put(serverInfo.getIp(), serverInfo);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
 }
