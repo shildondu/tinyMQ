@@ -16,7 +16,6 @@ public final class MessageRepl {
 
     public static void main(String[] args) {
         Serializer serializer = new ProtostuffSerializer();
-        MessageClient messageClient = MessageClient.getInstance();
         Publisher<String> publisher = PublisherFactory.create(serializer);
         Subscriber<String> subscriber = SubscriberFactory.create(String.class, serializer);
         Scanner scanner = new Scanner(System.in);
@@ -31,7 +30,8 @@ public final class MessageRepl {
                         System.out.println("---------> " + message);
                     });
                 } else if ("close".equals(line)) {
-                    messageClient.close();
+                    PublisherFactory.destroy();
+                    SubscriberFactory.destroy();
                 }
             } catch (Exception e) {
                 e.printStackTrace();

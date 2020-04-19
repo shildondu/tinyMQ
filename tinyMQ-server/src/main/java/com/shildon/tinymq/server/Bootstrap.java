@@ -12,6 +12,7 @@ import com.shildon.tinymq.core.protocol.MessageType;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
 import com.shildon.tinymq.core.transport.Client;
+import com.shildon.tinymq.core.transport.PooledClient;
 import com.shildon.tinymq.core.transport.Server;
 import com.shildon.tinymq.server.configuration.ConfigurationHolder;
 import com.shildon.tinymq.server.handler.MessageHandler;
@@ -85,7 +86,7 @@ public final class Bootstrap {
     private void registerToNameServer() {
         Serializer serializer = new ProtostuffSerializer();
         LoggingHandler loggingHandler = new LoggingHandler();
-        Client client = new Client.Builder()
+        Client client = new PooledClient.Builder()
                 .workerSize(1)
                 .workerName("register-worker")
                 .channelInitializer(new ChannelInitializer<SocketChannel>() {
@@ -131,7 +132,7 @@ public final class Bootstrap {
                                                         .build()
                                         )
                                         .build()
-                        )), 3, 10, TimeUnit.SECONDS);
+                        )), 3, 1, TimeUnit.MINUTES);
     }
 
 }
