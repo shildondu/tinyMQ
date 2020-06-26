@@ -1,7 +1,7 @@
 package com.shildon.tinymq.core.exchange;
 
 import com.shildon.tinymq.core.protocol.MessageProtocol;
-import com.shildon.tinymq.core.transport.Client;
+import com.shildon.tinymq.core.transport.NettyClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,9 +17,9 @@ public class MessageExchange {
 
     private static final Map<String, MessageFuture> MESSAGE_FUTURE_MAP = new ConcurrentHashMap<>();
 
-    private Client client;
+    private NettyClient client;
 
-    public MessageExchange(Client client) {
+    public MessageExchange(NettyClient client) {
         this.client = client;
     }
 

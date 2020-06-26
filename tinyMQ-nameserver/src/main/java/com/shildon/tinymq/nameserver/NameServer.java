@@ -6,7 +6,7 @@ import com.shildon.tinymq.core.codec.MessageProtocolDecoder;
 import com.shildon.tinymq.core.codec.MessageProtocolEncoder;
 import com.shildon.tinymq.core.processor.MessageHandler;
 import com.shildon.tinymq.core.processor.MessageProcessor;
-import com.shildon.tinymq.core.transport.Server;
+import com.shildon.tinymq.core.transport.NettyServer;
 import com.shildon.tinymq.nameserver.processor.RegisterServerProcessor;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.ServerSocketChannel;
@@ -28,10 +28,10 @@ public class NameServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(NameServer.class);
 
     public static void main(String[] args) {
-        final List<MessageProcessor> messageProcessors = new ArrayList<MessageProcessor>();
+        final List<MessageProcessor> messageProcessors = new ArrayList<>();
         messageProcessors.add(new RegisterServerProcessor());
         final LoggingHandler loggingHandler = new LoggingHandler();
-        new Server.Builder()
+        new NettyServer.Builder()
                 .port(20202)
                 .bossName("name-server-boss")
                 .workerName("name-server-worker")

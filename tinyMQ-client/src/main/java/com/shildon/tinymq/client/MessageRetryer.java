@@ -1,7 +1,7 @@
 package com.shildon.tinymq.client;
 
 import com.shildon.tinymq.core.protocol.MessageProtocol;
-import com.shildon.tinymq.core.transport.Client;
+import com.shildon.tinymq.core.transport.NettyClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,10 +18,10 @@ public class MessageRetryer {
 
     private static final long TIME_TO_WAIT = 60 * 1000;
 
-    private Client client;
+    private NettyClient client;
     private MessageCache messageCache = MessageCache.getInstance();
 
-    public MessageRetryer(Client client) {
+    public MessageRetryer(NettyClient client) {
         this.client = client;
     }
 

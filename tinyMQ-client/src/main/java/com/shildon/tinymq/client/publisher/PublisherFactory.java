@@ -6,8 +6,7 @@ import com.shildon.tinymq.core.codec.MessageFrameEncoder;
 import com.shildon.tinymq.core.codec.MessageProtocolDecoder;
 import com.shildon.tinymq.core.codec.MessageProtocolEncoder;
 import com.shildon.tinymq.core.serializer.Serializer;
-import com.shildon.tinymq.core.transport.Client;
-import com.shildon.tinymq.core.transport.PooledClient;
+import com.shildon.tinymq.core.transport.NettyClient;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LoggingHandler;
@@ -19,11 +18,11 @@ import io.netty.handler.logging.LoggingHandler;
  */
 public class PublisherFactory {
 
-    private static final Client CLIENT;
+    private static final NettyClient CLIENT;
 
     static {
         final LoggingHandler loggingHandler = new LoggingHandler();
-        CLIENT = new PooledClient.Builder()
+        CLIENT = new NettyClient.Builder()
                 .workerName("message-client-publisher-worker")
                 .channelInitializer(new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -45,7 +44,7 @@ public class PublisherFactory {
     }
 
     public static void destroy() {
-       CLIENT.close();
+        CLIENT.close();
     }
 
 }

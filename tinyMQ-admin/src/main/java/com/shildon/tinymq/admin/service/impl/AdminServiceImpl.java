@@ -11,7 +11,7 @@ import com.shildon.tinymq.core.protocol.MessageBody;
 import com.shildon.tinymq.core.protocol.MessageHeader;
 import com.shildon.tinymq.core.protocol.MessageProtocol;
 import com.shildon.tinymq.core.protocol.MessageType;
-import com.shildon.tinymq.core.transport.Client;
+import com.shildon.tinymq.core.transport.NettyClient;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
@@ -35,7 +35,7 @@ public class AdminServiceImpl implements AdminService {
 
     private void getServerInfos() {
         final LoggingHandler loggingHandler = new LoggingHandler();
-        Client client = new Client.Builder()
+        NettyClient client = new NettyClient.Builder()
                 .workerName("admin-worker")
                 .workerSize(1)
                 .channelInitializer(new ChannelInitializer<SocketChannel>() {
@@ -56,12 +56,12 @@ public class AdminServiceImpl implements AdminService {
             MessageProtocol request = new MessageProtocol.Builder()
                     .header(
                             new MessageHeader.Builder()
-                            .messageType(MessageType.GET_SERVER_LIST)
-                            .build()
+                                    .messageType(MessageType.GET_SERVER_LIST)
+                                    .build()
                     )
                     .body(
                             new MessageBody.Builder()
-                            .build()
+                                    .build()
                     )
                     .build();
             channel.writeAndFlush(request);

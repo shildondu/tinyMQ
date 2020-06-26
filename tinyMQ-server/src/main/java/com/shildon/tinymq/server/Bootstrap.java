@@ -11,9 +11,8 @@ import com.shildon.tinymq.core.protocol.MessageProtocol;
 import com.shildon.tinymq.core.protocol.MessageType;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
-import com.shildon.tinymq.core.transport.Client;
-import com.shildon.tinymq.core.transport.PooledClient;
-import com.shildon.tinymq.core.transport.Server;
+import com.shildon.tinymq.core.transport.NettyClient;
+import com.shildon.tinymq.core.transport.NettyServer;
 import com.shildon.tinymq.server.configuration.ConfigurationHolder;
 import com.shildon.tinymq.server.handler.MessageHandler;
 import io.netty.channel.Channel;
@@ -55,7 +54,7 @@ public final class Bootstrap {
 
     private void runServer() {
         LoggingHandler loggingHandler = new LoggingHandler();
-        new Server.Builder()
+        new NettyServer.Builder()
                 .port(this.configurationHolder.getPort())
                 .bossName("message-server-boss")
                 .workerName("message-server-worker")
@@ -86,7 +85,7 @@ public final class Bootstrap {
     private void registerToNameServer() {
         Serializer serializer = new ProtostuffSerializer();
         LoggingHandler loggingHandler = new LoggingHandler();
-        Client client = new PooledClient.Builder()
+        NettyClient client = new NettyClient.Builder()
                 .workerSize(1)
                 .workerName("register-worker")
                 .channelInitializer(new ChannelInitializer<SocketChannel>() {

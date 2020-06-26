@@ -18,9 +18,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @author shildon
  */
-public final class Server {
+public final class NettyServer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NettyServer.class);
 
     private int port;
     private ServerBootstrap serverBootstrap;
@@ -28,7 +28,7 @@ public final class Server {
     private EventLoopGroup workers;
     private GenericFutureListener<? extends Future<? super Void>> afterBindListener;
 
-    private Server(Builder builder) {
+    private NettyServer(Builder builder) {
         this.port = builder.port;
         this.boss = new NioEventLoopGroup(builder.bossSize, new DefaultThreadFactory(builder.bossName));
         if (builder.workerSize > 0) {
@@ -114,8 +114,8 @@ public final class Server {
             return this;
         }
 
-        public Server build() {
-            return new Server(this);
+        public NettyServer build() {
+            return new NettyServer(this);
         }
     }
 

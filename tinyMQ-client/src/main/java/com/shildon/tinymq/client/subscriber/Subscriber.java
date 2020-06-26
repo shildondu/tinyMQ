@@ -4,7 +4,7 @@ import com.shildon.tinymq.client.RegistryConsumerTable;
 import com.shildon.tinymq.core.protocol.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
-import com.shildon.tinymq.core.transport.Client;
+import com.shildon.tinymq.core.transport.NettyClient;
 
 import java.util.function.Consumer;
 
@@ -13,13 +13,13 @@ import java.util.function.Consumer;
  */
 public class Subscriber<T> {
 
-    private Client client;
+    private NettyClient client;
     private RegistryConsumerTable registryConsumerTable = RegistryConsumerTable.getInstance();
     private Serializer defaultSerializer = new ProtostuffSerializer();
     private Serializer serializer;
     private Class<T> genericType;
 
-    Subscriber(Client client, Class<T> genericType, Serializer serializer) {
+    Subscriber(NettyClient client, Class<T> genericType, Serializer serializer) {
         this.client = client;
         this.serializer = serializer;
         this.genericType = genericType;

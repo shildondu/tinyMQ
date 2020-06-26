@@ -22,26 +22,27 @@ import org.slf4j.LoggerFactory;
  *
  * @author shildon
  */
-public final class PooledClient implements Client {
+public final class NettyClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PooledClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NettyClient.class);
 
     private EventLoopGroup workers;
     private ChannelFactory channelFactory;
     private ObjectPool<Channel> channelPool;
+    private Bootstrap bootstrap;
 
-    private PooledClient(Builder builder) {
+    private NettyClient(Builder builder) {
         if (builder.workerSize > 0) {
             this.workers = new NioEventLoopGroup(builder.workerSize, new DefaultThreadFactory(builder.workerName));
         } else {
             this.workers = new NioEventLoopGroup(new DefaultThreadFactory(builder.workerName));
         }
-        Bootstrap bootstrap = new Bootstrap()
+        this.bootstrap = new Bootstrap()
                 .group(this.workers)
                 .channel(NioSocketChannel.class)
                 .handler(builder.channelInitializer)
                 .option(ChannelOption.TCP_NODELAY, true);
-        this.channelFactory = new ChannelFactory(bootstrap, builder.serverHost, builder.serverPort);
+        this.channelFactory = new ChannelFactory(this.bootstrap, builder.serverHost, builder.serverPort);
         this.channelPool = this.initChannelPool(builder.maxChannelSize);
     }
 
@@ -51,7 +52,10 @@ public final class PooledClient implements Client {
         return new GenericObjectPool<>(this.channelFactory, poolConfig);
     }
 
-    @Override
+    public Channel connect(String host, int port) throws InterruptedException {
+        return this.bootstrap.connect(host, port).sync().channel();
+    }
+
     public void write(MessageProtocol messageProtocol) throws Exception {
         Channel channel = this.channelPool.borrowObject();
         try {
@@ -61,7 +65,6 @@ public final class PooledClient implements Client {
         }
     }
 
-    @Override
     public void close() {
         this.channelPool.close();
         this.workers.shutdownGracefully();
@@ -105,8 +108,8 @@ public final class PooledClient implements Client {
             return this;
         }
 
-        public PooledClient build() {
-            return new PooledClient(this);
+        public NettyClient build() {
+            return new NettyClient(this);
         }
     }
 

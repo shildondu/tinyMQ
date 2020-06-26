@@ -4,19 +4,19 @@ import com.shildon.tinymq.client.MessageRetryer;
 import com.shildon.tinymq.core.protocol.*;
 import com.shildon.tinymq.core.serializer.ProtostuffSerializer;
 import com.shildon.tinymq.core.serializer.Serializer;
-import com.shildon.tinymq.core.transport.Client;
+import com.shildon.tinymq.core.transport.NettyClient;
 
 /**
  * @author shildon
  */
 public class Publisher<T> {
 
-    private Client client;
+    private NettyClient client;
     private Serializer serializer;
     private Serializer defaultSerializer = new ProtostuffSerializer();
     private MessageRetryer messageRetryer;
 
-    Publisher(Client client, Serializer serializer) {
+    Publisher(NettyClient client, Serializer serializer) {
         this.client = client;
         this.serializer = serializer;
         this.messageRetryer = new MessageRetryer(client);
