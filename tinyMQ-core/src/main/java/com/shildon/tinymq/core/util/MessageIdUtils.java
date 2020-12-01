@@ -1,8 +1,8 @@
 package com.shildon.tinymq.core.util;
 
-import com.shildon.tinymq.core.exception.MessageIdGenerationException;
-
 import java.nio.charset.StandardCharsets;
+
+import com.shildon.tinymq.core.exception.MessageIdGenerationException;
 
 /**
  * 消息id工具类
@@ -11,10 +11,17 @@ import java.nio.charset.StandardCharsets;
  */
 public final class MessageIdUtils {
 
+    private static final int MESSAGE_ID_LENGTH = 16;
+
+    private MessageIdUtils() {}
+
     public static String generate() {
-        // todo refactor message id generation.
-        String messageId = "1234567890123456";
-        if (messageId.getBytes(StandardCharsets.UTF_8).length != 16) {
+        final StringBuilder messageIdBuilder = new StringBuilder(String.valueOf(System.currentTimeMillis()));
+        while (messageIdBuilder.length() < MESSAGE_ID_LENGTH) {
+            messageIdBuilder.append("0");
+        }
+        final String messageId = messageIdBuilder.toString();
+        if (messageId.getBytes(StandardCharsets.UTF_8).length != MESSAGE_ID_LENGTH) {
             throw new MessageIdGenerationException();
         }
         return messageId;
