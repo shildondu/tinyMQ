@@ -1,4 +1,4 @@
-# TinyMQ ![build](https://travis-ci.org/shildondu/tinyMQ.svg?branch=master)
+# TinyMQ
 
 ## 整体架构
 
