@@ -24,7 +24,7 @@ public final class MessageRepl {
             try {
                 line = scanner.nextLine();
                 if ("publish".equals(line)) {
-                    publisher.publish("test", "melody");
+                    publisher.publish("shildon.test", "melody");
                 } else if ("subscribe".equals(line)) {
                     subscriber.subscribe("test", message -> {
                         System.out.println("---------> " + message);

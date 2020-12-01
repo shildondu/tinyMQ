@@ -77,7 +77,7 @@ public final class Bootstrap {
                                 .addLast(new MessageHandler());
                     }
                 })
-                .afterBindListener(it -> registerToNameServer())
+                // .afterBindListener(it -> registerToNameServer())
                 .build()
                 .run();
     }

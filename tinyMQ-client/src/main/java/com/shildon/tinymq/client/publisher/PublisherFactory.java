@@ -23,6 +23,8 @@ public class PublisherFactory {
     static {
         final LoggingHandler loggingHandler = new LoggingHandler();
         CLIENT = new NettyClient.Builder()
+                .serverHost("127.0.0.1")
+                .serverPort(10101)
                 .workerName("message-client-publisher-worker")
                 .channelInitializer(new ChannelInitializer<SocketChannel>() {
                     @Override
