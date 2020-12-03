@@ -1,9 +1,13 @@
 package com.shildon.tinymq.server.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,6 +24,7 @@ public class Topic {
     private final AtomicInteger queueIndex = new AtomicInteger(0);
     // <group name, <ip, queue index>>
     private final Map<String, Group> groupMap = new ConcurrentHashMap<>();
+    private final Map<Integer, Set<Subscriber>> subscribers = new ConcurrentHashMap<>();
 
     public Topic(final String name) {
         this(name, 6);
@@ -34,29 +39,51 @@ public class Topic {
         }
     }
 
-    public void offer(final byte[] data) {
+    public int offer(final byte[] data) {
         final int index = this.queueIndex.getAndUpdate(it -> (it + 1) % this.queueSize);
         // round robin
         this.queues.get(index).offer(data);
+        return index;
     }
 
-    public void subscribe(final String groupName, final String ip) {
-        // think about thread safe
-        Group group = this.groupMap.get(groupName);
-        if (group == null) {
-            group = new Group(groupName);
-            this.groupMap.put(groupName, group);
-        }
-        if (group.getSubscriberMap().containsKey(ip)) {
+    public Set<Subscriber> getSubscribers(final int queueIndex) {
+        return this.subscribers.get(queueIndex);
+    }
+
+    private boolean hasSubscribed(final Subscriber subscriber) {
+        return this.subscribers.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet())
+                .contains(subscriber);
+    }
+
+    private Set<Subscriber> getSameGroupSubscribers(final Subscriber subscriber) {
+        final Set<Subscriber> sameGroupSubscribers = new HashSet<>();
+        sameGroupSubscribers.add(subscriber);
+        this.subscribers.values()
+                .forEach(it -> {
+                    final Iterator<Subscriber> iterator = it.iterator();
+                    while (iterator.hasNext()) {
+                        final Subscriber current = iterator.next();
+                        if (current.getGroup().equals(subscriber.getGroup())) {
+                            iterator.remove();
+                            sameGroupSubscribers.add(current);
+                        }
+                    }
+                });
+        return sameGroupSubscribers;
+    }
+
+    public void subscribe(final Subscriber subscriber) {
+        if (this.hasSubscribed(subscriber)) {
             return;
         }
-        // re allocate queue to subscriber
-        group.getSubscriberMap().putIfAbsent(ip, new Subscriber(ip));
-        final List<Subscriber> subscribers = group.getSubscriberMap()
-                .values()
-                .stream()
-                .sorted((s1, s2) -> (int) (s1.ip2Long() - s2.ip2Long()))
-                .collect(Collectors.toList());
+        final Set<Subscriber> sameGroupSubscribers = this.getSameGroupSubscribers(subscriber);
+        this.reBalance(sameGroupSubscribers);
+    }
+
+    private void reBalance(Set<Subscriber> sameGroupSubscribers) {
     }
 
     public void unsubscribe() {

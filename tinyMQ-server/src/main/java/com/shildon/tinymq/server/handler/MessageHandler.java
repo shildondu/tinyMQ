@@ -1,5 +1,7 @@
 package com.shildon.tinymq.server.handler;
 
+import java.util.Set;
+
 import com.shildon.tinymq.core.protocol.MessageProtocol;
 import com.shildon.tinymq.core.protocol.MessageType;
 import com.shildon.tinymq.core.protocol.PublishMessageBody;
@@ -11,6 +13,7 @@ import com.shildon.tinymq.server.MessageRetryer;
 import com.shildon.tinymq.server.cache.MessageCache;
 import com.shildon.tinymq.server.cache.RegistryChannelTable;
 import com.shildon.tinymq.server.cache.TopicCache;
+import com.shildon.tinymq.server.model.Subscriber;
 import com.shildon.tinymq.server.model.Topic;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -43,13 +46,16 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageProtocol>
                 final PublishMessageBody publishMessageBody = this.serializer.deserialize(serializedRequestBody, PublishMessageBody.class);
                 // send message to topic
                 final Topic topic = this.topicCache.getTopic(publishMessageBody.getTopic());
-                topic.offer(publishMessageBody.getSerializedMessage());
+                final int queueIndex = topic.offer(publishMessageBody.getSerializedMessage());
+                final Set<Subscriber> subscribers = topic.getSubscribers(queueIndex);
+                // todo push to subscribers
                 // return ack to publisher
                 ctx.channel().writeAndFlush(MessageProtocolUtils.ack(request.getHeader().getMessageId()));
                 break;
             }
             case SUBSCRIBE: {
                 final SubscribeMessageBody subscribeMessageBody = this.serializer.deserialize(serializedRequestBody, SubscribeMessageBody.class);
+                Subscriber subscriber = new Subscriber(subscribeMessageBody.getTopic(), subscribeMessageBody.getGroup(), ctx.channel());
                 this.registryChannelTable.put(subscribeMessageBody.getTopic(), ctx.channel());
                 break;
             }
