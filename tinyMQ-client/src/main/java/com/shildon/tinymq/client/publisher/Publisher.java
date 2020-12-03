@@ -11,22 +11,22 @@ import com.shildon.tinymq.core.transport.NettyClient;
  */
 public class Publisher<T> {
 
-    private NettyClient client;
-    private Serializer serializer;
-    private Serializer defaultSerializer = new ProtostuffSerializer();
-    private MessageRetryer messageRetryer;
+    private final NettyClient client;
+    private final Serializer serializer;
+    private final Serializer defaultSerializer = new ProtostuffSerializer();
+    private final MessageRetryer messageRetryer;
 
-    Publisher(NettyClient client, Serializer serializer) {
+    Publisher(final NettyClient client, final Serializer serializer) {
         this.client = client;
         this.serializer = serializer;
         this.messageRetryer = new MessageRetryer(client);
     }
 
-    public void publish(String topic, T message) throws Exception {
-        byte[] serializedMessage = this.serializer.serialize(message);
-        PublishMessageBody requestBody = new PublishMessageBody(topic, serializedMessage);
-        byte[] serializedBody = this.defaultSerializer.serialize(requestBody);
-        MessageProtocol request = new MessageProtocol.Builder()
+    public void publish(final String topic, final T message) throws Exception {
+        final byte[] serializedMessage = this.serializer.serialize(message);
+        final PublishMessageBody requestBody = new PublishMessageBody(topic, serializedMessage);
+        final byte[] serializedBody = this.defaultSerializer.serialize(requestBody);
+        final MessageProtocol request = new MessageProtocol.Builder()
                 .header(
                         new MessageHeader.Builder()
                                 .messageType(MessageType.PUBLISH)
@@ -41,7 +41,7 @@ public class Publisher<T> {
         try {
             this.client.write(request);
         } finally {
-            messageRetryer.retry(request);
+            this.messageRetryer.retry(request);
         }
     }
 
