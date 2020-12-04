@@ -80,10 +80,15 @@ public class Topic {
             return;
         }
         final Set<Subscriber> sameGroupSubscribers = this.getSameGroupSubscribers(subscriber);
-        this.reBalance(sameGroupSubscribers);
+        this.reBalance(new ArrayList<>(sameGroupSubscribers));
     }
 
-    private void reBalance(Set<Subscriber> sameGroupSubscribers) {
+    private void reBalance(final List<Subscriber> sameGroupSubscribers) {
+        final int sameGroupSubscribersSize = sameGroupSubscribers.size();
+        int i = 0;
+        for (final Map.Entry<Integer, Set<Subscriber>> queueWithSubscribers : this.subscribers.entrySet()) {
+            queueWithSubscribers.getValue().add(sameGroupSubscribers.get(i++ % sameGroupSubscribersSize));
+        }
     }
 
     public void unsubscribe() {
