@@ -55,8 +55,9 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageProtocol>
             }
             case SUBSCRIBE: {
                 final SubscribeMessageBody subscribeMessageBody = this.serializer.deserialize(serializedRequestBody, SubscribeMessageBody.class);
-                Subscriber subscriber = new Subscriber(subscribeMessageBody.getTopic(), subscribeMessageBody.getGroup(), ctx.channel());
-                this.registryChannelTable.put(subscribeMessageBody.getTopic(), ctx.channel());
+                final Subscriber subscriber = new Subscriber(subscribeMessageBody.getTopic(), subscribeMessageBody.getGroup(), ctx.channel());
+                final Topic topic = this.topicCache.getTopic(subscribeMessageBody.getTopic());
+                topic.subscribe(subscriber);
                 break;
             }
             default:

@@ -1,9 +1,8 @@
 package com.shildon.tinymq.server.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.net.InetSocketAddress;
+import java.util.Objects;
 
-import com.shildon.tinymq.core.model.Pair;
 import io.netty.channel.Channel;
 
 /**
@@ -14,13 +13,12 @@ public class Subscriber {
     private String group;
     private Channel channel;
     private String ip;
-    // <queue index, offset>
-    private final List<Pair<Integer, Long>> queueInfos = new ArrayList<>();
 
     public Subscriber(final String topic, final String group, final Channel channel) {
         this.topic = topic;
         this.group = group;
         this.channel = channel;
+        this.ip = ((InetSocketAddress) channel.remoteAddress()).getAddress().getHostAddress();
     }
 
     public Subscriber(final String ip) {
@@ -37,20 +35,41 @@ public class Subscriber {
     }
 
     @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        }
+        final Subscriber that = (Subscriber) o;
+        return Objects.equals(this.topic, that.topic) &&
+                Objects.equals(this.group, that.group) &&
+                Objects.equals(this.channel, that.channel) &&
+                Objects.equals(this.ip, that.ip);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.topic, this.group, this.channel, this.ip);
+    }
+
+    @Override
     public String toString() {
         return "Subscriber{" +
-                "ip='" + this.ip + '\'' +
-                ", queueInfos=" + this.queueInfos +
+                "topic='" + this.topic + '\'' +
+                ", group='" + this.group + '\'' +
+                ", channel=" + this.channel +
+                ", ip='" + this.ip + '\'' +
                 '}';
     }
 
-    public String getIp() {
-        return this.ip;
+    public String getTopic() {
+        return this.topic;
     }
 
-    public Subscriber setIp(final String ip) {
-        this.ip = ip;
-        return this;
+    public void setTopic(final String topic) {
+        this.topic = topic;
     }
 
     public String getGroup() {
@@ -61,12 +80,19 @@ public class Subscriber {
         this.group = group;
     }
 
-    public Subscriber resetQueueInfos() {
-        this.queueInfos.clear();
-        return this;
+    public Channel getChannel() {
+        return this.channel;
     }
 
-    public void addQueueInfo(final Pair<Integer, Long> queueInfo) {
-        this.queueInfos.add(queueInfo);
+    public void setChannel(final Channel channel) {
+        this.channel = channel;
+    }
+
+    public String getIp() {
+        return this.ip;
+    }
+
+    public void setIp(final String ip) {
+        this.ip = ip;
     }
 }
