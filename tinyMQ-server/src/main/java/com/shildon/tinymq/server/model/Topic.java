@@ -22,9 +22,7 @@ public class Topic {
     private final List<Queue<byte[]>> queues;
     private final int queueSize;
     private final AtomicInteger queueIndex = new AtomicInteger(0);
-    // <group name, <ip, queue index>>
-    private final Map<String, Group> groupMap = new ConcurrentHashMap<>();
-    private final Map<Integer, Set<Subscriber>> subscribers = new ConcurrentHashMap<>();
+    private final Map<Integer, Set<Subscriber>> subscribers;
 
     public Topic(final String name) {
         this(name, 6);
@@ -36,6 +34,10 @@ public class Topic {
         this.queues = new ArrayList<>(queueSize);
         for (int i = 0; i < queueSize; i++) {
             this.queues.add(new LinkedBlockingQueue<>());
+        }
+        this.subscribers = new ConcurrentHashMap<>();
+        for (int i = 0; i < this.queueSize; i++) {
+            this.subscribers.put(i, new HashSet<>());
         }
     }
 
