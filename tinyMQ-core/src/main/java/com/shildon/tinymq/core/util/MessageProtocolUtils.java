@@ -13,17 +13,27 @@ public final class MessageProtocolUtils {
     private MessageProtocolUtils() {}
 
     public static MessageProtocol ack(final String messageId) {
-        return new MessageProtocol.Builder()
+        return message(MessageType.ACK, messageId, null);
+    }
+
+    public static MessageProtocol publish(final String messageId, final byte[] serializedData) {
+        return message(MessageType.PUBLISH, messageId, serializedData);
+    }
+
+    public static MessageProtocol message(final MessageType messageType, final String messageId, final byte[] serializedData) {
+        final MessageProtocol.Builder messageProtocolBuilder = new MessageProtocol.Builder()
                 .header(
                         new MessageHeader.Builder()
-                                .messageType(MessageType.ACK)
+                                .messageType(messageType)
                                 .messageId(messageId)
                                 .build()
-                )
-                .body(
-                        new MessageBody.Builder()
-                                .build()
-                )
+                );
+
+        final MessageBody.Builder messageBodyBuilder = new MessageBody.Builder();
+        if (serializedData != null && serializedData.length > 0) {
+            messageBodyBuilder.serializedData(serializedData);
+        }
+        return messageProtocolBuilder.body(messageBodyBuilder.build())
                 .build();
     }
 

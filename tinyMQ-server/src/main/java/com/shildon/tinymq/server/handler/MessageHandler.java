@@ -47,8 +47,9 @@ public class MessageHandler extends SimpleChannelInboundHandler<MessageProtocol>
                 // send message to topic
                 final Topic topic = this.topicCache.getTopic(publishMessageBody.getTopic());
                 final int queueIndex = topic.offer(publishMessageBody.getSerializedMessage());
+                // send message to subscribers
                 final Set<Subscriber> subscribers = topic.getSubscribers(queueIndex);
-                // todo push to subscribers
+                subscribers.forEach(subscriber -> subscriber.getChannel().writeAndFlush(MessageProtocolUtils.publish(request.getHeader().getMessageId(), serializedRequestBody)));
                 // return ack to publisher
                 ctx.channel().writeAndFlush(MessageProtocolUtils.ack(request.getHeader().getMessageId()));
                 break;
